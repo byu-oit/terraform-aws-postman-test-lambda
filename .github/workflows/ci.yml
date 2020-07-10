@@ -82,3 +82,51 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: ${{ matrix.env.tf_working_dir }}
           terraform-plan-file: plan
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.node_version }}
+
+      - name: npm install
+        working-directory: lambda
+        run: npm install --production
+
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.node_version }}
+
+      - name: npm audit
+        working-directory: lambda
+        run: npm audit --audit-level=critical
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.node_version }}
+
+      - name: npm install
+        working-directory: lambda
+        run: npm install
+
+      - name: npm lint
+        working-directory: lambda
+        run: npm run lint

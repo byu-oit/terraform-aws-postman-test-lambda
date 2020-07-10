@@ -17,3 +17,5 @@ override.tf.json
 
 # Ignore jetbrains .idea folder
 .idea
+
+node_modules

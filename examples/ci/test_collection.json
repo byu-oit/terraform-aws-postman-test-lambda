@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "f49e7563-d035-4164-baa9-0e77af3c6221",
+		"name": "simple-example-test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "24c58423-6eb9-4ce5-9d28-b579702c91ef",
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{context}}/get",
+					"host": [
+						"{{context}}"
+					],
+					"path": [
+						"get"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
