@@ -20,6 +20,37 @@ module "postman_test_lambda" {
 }
 ```
 
+Then add your lambda function_name to the CodeDeploy lifecycle hook you want the postman tests to run on.
+For instance, if you're using the [fargate-api module](https://github.com/byu-oit/terraform-aws-fargate-api):
+```hcl
+# ... postman-test-lambda module
+
+module "fargate_api" {
+  source = "github.com/byu-oit/terraform-aws-fargate-api?ref=" # latest version
+  # .. all other variables
+  codedeploy_lifecycle_hooks = {
+    BeforeInstall         = null
+    AfterInstall          = null
+    AfterAllowTestTraffic = module.postman_test_lambda.lambda_function.function_name
+    BeforeAllowTraffic    = null
+    AfterAllowTraffic     = null
+  }
+}
+```
+Or if you're using the [lambda-api module](https://github.com/byu-oit/terraform-aws-lambda-api):
+```hcl
+# ... postman-test-lambda module
+
+module "fargate_api" {
+  source = "github.com/byu-oit/terraform-aws-lambda-api?ref=" # latest version
+  # .. all other variables
+  codedeploy_lifecycle_hooks = {
+    BeforeAllowTraffic = module.postman_test_lambda.lambda_function.function_name
+    AfterAllowTraffic  = null
+  }
+}
+```
+
 ## Requirements
 * Terraform version 0.12.16 or greater
 
