@@ -4,12 +4,12 @@ variable "app_name" {
 
 variable "postman_collection" {
   description = "Postman collection JSON file"
-  type = string
+  type        = string
 }
 
 variable "postman_environment" {
   description = "Postman environment JSON file"
-  type = string
+  type        = string
 }
 
 variable "role_permissions_boundary_arn" {

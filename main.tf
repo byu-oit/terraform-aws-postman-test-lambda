@@ -11,18 +11,18 @@ locals {
 
 resource "local_file" "copy_collection_to_lambda_dir" {
   filename = "${local.postman_dir}/${basename(var.postman_collection)}"
-  content = templatefile(var.postman_collection, {})
+  content  = templatefile(var.postman_collection, {})
 }
 
 resource "local_file" "copy_environment_to_lambda_dir" {
   filename = "${local.postman_dir}/${basename(var.postman_environment)}"
-  content = templatefile(var.postman_environment, {})
+  content  = templatefile(var.postman_environment, {})
 }
 
 data "archive_file" "function_zip" {
-  type = "zip"
+  type        = "zip"
   output_path = "function.zip"
-  source_dir = "${path.module}/lambda"
+  source_dir  = "${path.module}/lambda"
 
   depends_on = [local_file.copy_collection_to_lambda_dir, local_file.copy_environment_to_lambda_dir]
 }
@@ -37,7 +37,7 @@ resource "aws_lambda_function" "test_lambda" {
   source_code_hash = data.archive_file.function_zip.output_base64sha256
   environment {
     variables = {
-      "POSTMAN_COLLECTION" = ".postman/${basename(local_file.copy_collection_to_lambda_dir.filename)}"
+      "POSTMAN_COLLECTION"  = ".postman/${basename(local_file.copy_collection_to_lambda_dir.filename)}"
       "POSTMAN_ENVIRONMENT" = ".postman/${basename(local_file.copy_environment_to_lambda_dir.filename)}"
     }
   }

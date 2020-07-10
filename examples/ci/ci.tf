@@ -8,9 +8,9 @@ data aws_ssm_parameter role_permissions_boundary_arn {
 }
 
 module "postman_test_lambda" {
-  source = "../../"
-  app_name = "postman-test-lambda-ci-example"
-  postman_collection = "test_collection.json"
-  postman_environment = "test_environment.json"
+  source                        = "../../"
+  app_name                      = "postman-test-lambda-ci-example"
+  postman_collection            = "test_collection.json"
+  postman_environment           = "test_environment.json"
   role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
 }
