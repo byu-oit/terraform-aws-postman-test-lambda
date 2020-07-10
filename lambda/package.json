@@ -1,20 +1,20 @@
 {
   "name": "postman-test-lambda",
   "version": "1.0.0",
-  "description": "",
+  "description": "Lambda function that runs postman collection tests",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/byu-oit/terraform-aws-postman-test-lambda"
+  },
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "lint": "npx standard",
-    "pack": "ncc build"
+    "lint": "npx standard"
   },
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.676.0",
     "newman": "^5.0.0"
-  },
-  "devDependencies": {
-    "@zeit/ncc": "^0.20.5"
   }
 }

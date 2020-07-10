@@ -10,7 +10,7 @@ exports.handler = async function (event, context) {
   await sleep(10000)
 
   let errorFromTests
-  await runTests('.postman').catch(err => { errorFromTests = err })
+  await runTests(process.env.POSTMAN_COLLECTION, process.env.POSTMAN_ENVIRONMENT).catch(err => { errorFromTests = err })
 
   const params = {
     deploymentId: event.DeploymentId,
@@ -34,11 +34,12 @@ function newmanRun (options) {
   })
 }
 
-async function runTests (postmanFilesDir) {
+async function runTests (postmanCollection, postmanEnvironment) {
   try {
+    console.log('running postman tests')
     await newmanRun({
-      collection: require(`${postmanFilesDir}/hw-fargate-api.postman_collection.json`),
-      environment: require(`${postmanFilesDir}/${process.env.ENV}-tst.postman_environment.json`),
+      collection: postmanCollection,
+      environment: postmanEnvironment,
       reporters: 'cli',
       abortOnFailure: true
     })
