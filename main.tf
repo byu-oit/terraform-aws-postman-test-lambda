@@ -11,12 +11,12 @@ locals {
 
 resource "local_file" "copy_collection_to_lambda_dir" {
   filename = "${local.postman_dir}/${basename(var.postman_collection)}"
-  content  = templatefile(var.postman_collection, {})
+  content  = file(var.postman_collection)
 }
 
 resource "local_file" "copy_environment_to_lambda_dir" {
   filename = "${local.postman_dir}/${basename(var.postman_environment)}"
-  content  = templatefile(var.postman_environment, {})
+  content  = file(var.postman_environment)
 }
 
 data "archive_file" "function_zip" {
