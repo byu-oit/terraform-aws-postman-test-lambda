@@ -1,6 +1,8 @@
 const newman = require('newman')
 const AWS = require('aws-sdk')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
+const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
+const fs = require('fs')
 
 exports.handler = async function (event, context) {
   console.log(event)
@@ -10,7 +12,11 @@ exports.handler = async function (event, context) {
   await sleep(10000)
 
   let errorFromTests
-  await runTests(process.env.POSTMAN_COLLECTION, process.env.POSTMAN_ENVIRONMENT).catch(err => { errorFromTests = err })
+
+  const collectionFile = await downloadFileFromBucket(process.env.POSTMAN_COLLECTION)
+  const environmentFile = await downloadFileFromBucket(process.env.POSTMAN_ENVIRONMENT)
+
+  await runTests(collectionFile, environmentFile).catch(err => { errorFromTests = err })
 
   const params = {
     deploymentId: event.DeploymentId,
@@ -26,6 +32,32 @@ exports.handler = async function (event, context) {
   }
 
   if (errorFromTests) throw errorFromTests // Cause the lambda to "fail"
+}
+
+function downloadFileFromBucket (key) {
+  try {
+    console.log(`getting ${key} from bucket`)
+    return new Promise((resolve, reject) => {
+      s3.getObject({
+        Bucket: process.env.S3_BUCKET,
+        Key: key
+      }, (err, data) => {
+        if (err) {
+          console.error(`error trying to get object from bucket: ${err}`)
+          reject(err)
+        } else {
+          console.log('no error, writing to file')
+
+          fs.writeFileSync(`./.postman/${key}`, data.Body.toString());
+          console.log(`wrote to ./.postman/${key}`)
+          resolve(`./.postman/${key}`)
+        }
+      })
+    })
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
 }
 
 function newmanRun (options) {
