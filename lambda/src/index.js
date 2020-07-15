@@ -48,7 +48,7 @@ function downloadFileFromBucket (key) {
         } else {
           console.log('no error, writing to file')
 
-          fs.writeFileSync(`./.postman/${key}`, data.Body.toString());
+          fs.writeFileSync(`./.postman/${key}`, data.Body.toString())
           console.log(`wrote to ./.postman/${key}`)
           resolve(`./.postman/${key}`)
         }
