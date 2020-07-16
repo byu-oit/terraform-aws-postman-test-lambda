@@ -9,12 +9,14 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "lint": "npx standard"
+    "lint": "npx standard",
+    "zip": "zip dist/function.zip src/index.js -r node_modules"
   },
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.676.0",
-    "newman": "^5.0.0"
+    "newman": "^5.0.0",
+    "node-fetch": "^2.6.0"
   }
 }

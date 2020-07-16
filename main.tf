@@ -5,40 +5,19 @@ terraform {
   }
 }
 
-locals {
-  postman_dir = "${path.module}/lambda/.postman"
-}
-
-resource "local_file" "copy_collection_to_lambda_dir" {
-  filename = "${local.postman_dir}/${basename(var.postman_collection)}"
-  content  = templatefile(var.postman_collection, {})
-}
-
-resource "local_file" "copy_environment_to_lambda_dir" {
-  filename = "${local.postman_dir}/${basename(var.postman_environment)}"
-  content  = templatefile(var.postman_environment, {})
-}
-
-data "archive_file" "function_zip" {
-  type        = "zip"
-  output_path = "function.zip"
-  source_dir  = "${path.module}/lambda"
-
-  depends_on = [local_file.copy_collection_to_lambda_dir, local_file.copy_environment_to_lambda_dir]
-}
-
 resource "aws_lambda_function" "test_lambda" {
-  filename         = data.archive_file.function_zip.output_path
+  filename         = "${path.module}/lambda/dist/function.zip"
   function_name    = "${var.app_name}-postman-tests"
   role             = aws_iam_role.test_lambda.arn
   handler          = "src/index.handler"
   runtime          = "nodejs12.x"
   timeout          = 30
-  source_code_hash = data.archive_file.function_zip.output_base64sha256
+  source_code_hash = base64sha256("${path.module}/lambda/dist/function.zip")
   environment {
     variables = {
-      "POSTMAN_COLLECTION"  = ".postman/${basename(local_file.copy_collection_to_lambda_dir.filename)}"
-      "POSTMAN_ENVIRONMENT" = ".postman/${basename(local_file.copy_environment_to_lambda_dir.filename)}"
+      "POSTMAN_COLLECTION_NAME"  = var.postman_collection_name
+      "POSTMAN_ENVIRONMENT_NAME" = var.postman_environment_name
+      "POSTMAN_API_KEY"          = var.postman_api_key
     }
   }
 }

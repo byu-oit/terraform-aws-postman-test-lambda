@@ -7,11 +7,16 @@ data aws_ssm_parameter role_permissions_boundary_arn {
   name = "/acs/iam/iamRolePermissionBoundary"
 }
 
+variable "postman_api_key" {
+  type = string
+}
+
 module "postman_test_lambda" {
   //  source = "github.com/byu-oit/terraform-aws-<module_name>?ref=v1.0.0"
   source                        = "../../" # for local testing during module development
   app_name                      = "simple-example"
-  postman_collection            = "test_collection.json"
-  postman_environment           = "test_environment.json"
+  postman_collection_name       = "terraform-aws-postman-test-lambda-example"
+  postman_environment_name      = "terraform-aws-postman-test-lambda-env"
+  postman_api_key               = var.postman_api_key
   role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
 }

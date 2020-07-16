@@ -6,6 +6,7 @@ on:
     types: [opened, reopened, synchronize, edited]
 env:
   tf_version: "0.12.26" # must match value in examples/ci/ci.tf
+  TF_IN_AUTOMATION: true
 
 jobs:
   env:
@@ -74,7 +75,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false -out=plan
+        run: terraform plan -input=false -out=plan -var postman_api_key=${secrets.postman_api_key}
 
       - name: Comment Terraform Plan
         uses: byu-oit/github-action-tf-plan-comment@v1
