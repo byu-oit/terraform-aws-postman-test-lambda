@@ -13,10 +13,11 @@ This lambda function will tell CodeDeploy if the tests pass or fail.
 ```hcl
 module "postman_test_lambda" {
   source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v0.1.0"
-  app_name                      = "simple-example"
-  postman_collection            = "test_collection.json"
-  postman_environment           = "test_environment.json"
-  role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
+    app_name                      = "simple-example"
+    postman_collection_name       = "terraform-aws-postman-test-lambda-example"
+    postman_environment_name      = "terraform-aws-postman-test-lambda-env"
+    postman_api_key               = var.postman_api_key
+    role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
 }
 ```
 
@@ -41,7 +42,7 @@ Or if you're using the [lambda-api module](https://github.com/byu-oit/terraform-
 ```hcl
 # ... postman-test-lambda module
 
-module "fargate_api" {
+module "lambda_api" {
   source = "github.com/byu-oit/terraform-aws-lambda-api?ref=" # latest version
   # .. all other variables
   codedeploy_lifecycle_hooks = {
@@ -58,8 +59,9 @@ module "fargate_api" {
 | Name | Type  | Description | Default |
 | --- | --- | --- | --- |
 | app_name | string | Application name to name your postman test lambda function | |
-| postman_collection | string | Postman collection JSON file to test | | 
-| postman_environment | string | Postman environment JSON file to use during test | |
+| postman_collection_name | string | Name of Postman collection to download from Postman API | | 
+| postman_environment_name | string | Name of Postman environment to download from Postman API | |
+| postman_api_key | string | postman API key to download collection and environment from Postman API | |
 | role_permissions_boundary_arn | string | ARN of the IAM Role permissions boundary to place on each IAM role created | |
 
 ## Outputs

@@ -20,12 +20,12 @@ variable "role_permissions_boundary_arn" {
 
 variable "postman_collection_name" {
   type        = string
-  description = "Name of the postman collection to download from Postman's API (must provide postman_api_key)"
+  description = "Name of Postman collection to download from Postman API"
 }
 
 variable "postman_environment_name" {
   type        = string
-  description = "Name of the postman environment to download from Postman's API (must provide postman_api_key)"
+  description = "Name of the postman environment to download from Postman's API"
 }
 
 variable "postman_api_key" {
