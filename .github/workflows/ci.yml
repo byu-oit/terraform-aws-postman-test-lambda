@@ -75,7 +75,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false -out=plan -var postman_api_key=${secrets.postman_api_key}
+        run: terraform plan -input=false -out=plan -var 'postman_api_key=${secrets.postman_api_key}'
 
       - name: Comment Terraform Plan
         uses: byu-oit/github-action-tf-plan-comment@v1

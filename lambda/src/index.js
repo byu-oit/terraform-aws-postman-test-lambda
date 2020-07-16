@@ -104,4 +104,4 @@ function sleep (ms) {
 }
 
 // runTests('../../../.postman')
-exports.handler({}, {})
+// exports.handler({}, {})
