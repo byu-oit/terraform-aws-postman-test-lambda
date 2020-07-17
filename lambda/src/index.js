@@ -5,20 +5,28 @@ const streamPipeline = util.promisify(require('stream').pipeline)
 const newman = require('newman')
 const AWS = require('aws-sdk')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
+const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
 
 exports.handler = async function (event, context) {
   console.log(event)
-
   // Workaround for CodeDeploy bug.
   // Give the ALB 10 seconds to make sure the test TG has switched to the new code.
   const timer = sleep(10000)
 
-  // start downloading postman files
-  const downloadCollection = downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME)
-  const downloadEnv = downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
+  if (process.env.POSTMAN_API_KEY) {
+    // start downloading postman files from Postman API
+    const downloadCollection = downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME)
+    const downloadEnv = downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
+    await downloadCollection
+    await downloadEnv
 
-  await downloadCollection
-  await downloadEnv
+  } else {
+    // start downloading postman files from S3 Bucket
+    const downloadCollection = downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION)
+    const downloadEnv = downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
+    await downloadCollection
+    await downloadEnv
+  }
 
   let errorFromTests
   const postmanTests = runTests(
@@ -29,18 +37,23 @@ exports.handler = async function (event, context) {
   await postmanTests
   await timer
 
-  console.log('starting to update CodeDeploy lifecycle event hook status...')
-  const params = {
-    deploymentId: event.DeploymentId,
-    lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
-    status: errorFromTests ? 'Failed' : 'Succeeded'
-  }
-  try {
-    const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
-    console.log(data)
-  } catch (err) {
-    console.log(err, err.stack)
-    throw err
+  const deploymentId = event.DeploymentId
+  if (deploymentId) {
+    console.log('starting to update CodeDeploy lifecycle event hook status...')
+    const params = {
+      deploymentId: event.DeploymentId,
+      lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
+      status: errorFromTests ? 'Failed' : 'Succeeded'
+    }
+    try {
+      const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
+      console.log(data)
+    } catch (err) {
+      console.log(err, err.stack)
+      throw err
+    }
+  } else {
+    console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
   }
 
   if (errorFromTests) throw errorFromTests // Cause the lambda to "fail"
@@ -69,10 +82,34 @@ async function downloadFileFromPostman (type, name) {
         'X-Api-Key': process.env.POSTMAN_API_KEY
       }
     })
-    await streamPipeline(actualResponse.body, fs.createWriteStream(`./${type}.json`))
+    fs.writeFileSync(`./${type}.json`, await actualResponse.json())
     console.log(`downloaded ./${type}.json`)
   } catch (error) {
     console.error('Error in fetch', error)
+  }
+}
+
+function downloadFileFromBucket (type, key) {
+  console.log(`started download for ${type} with key ${key} from s3 bucket`)
+  try {
+    return new Promise((resolve, reject) => {
+      s3.getObject({
+        Bucket: process.env.S3_BUCKET,
+        Key: key
+      }, (err, data) => {
+        if (err) {
+          console.error(`error trying to get object from bucket: ${err}`)
+          reject(err)
+        } else {
+          fs.writeFileSync(`./${type}.json`, data.Body.toString())
+          console.log(`downloaded ./${type}.json`)
+          resolve()
+        }
+      })
+    })
+  } catch (err) {
+    console.log(err)
+    throw err
   }
 }
 
@@ -104,4 +141,4 @@ function sleep (ms) {
 }
 
 // runTests('../../../.postman')
-// exports.handler({}, {})
+exports.handler({}, {})
