@@ -5,31 +5,31 @@ variable "app_name" {
 
 variable "postman_collection_file" {
   type        = string
-  description = "Postman collection JSON file to test"
+  description = "Path to the postman collection JSON file relative from terraform dir (must be provided with postman_environment_file) "
   default     = null
 }
 
 variable "postman_environment_file" {
   type        = string
-  description = "Postman environment JSON file to use during test"
+  description = "Path to the postman environment JSON file relative from terraform dir (must be provided with postman_collection_file) "
   default     = null
 }
 
 variable "postman_collection_name" {
   type        = string
-  description = "Name of Postman collection to download from Postman API"
+  description = "Name of Postman collection to download from Postman API (must be provided with postman_api_key and postman_environment_name)"
   default     = null
 }
 
 variable "postman_environment_name" {
   type        = string
-  description = "Name of the postman environment to download from Postman's API"
+  description = "Name of the postman environment to download from Postman's API (must be provided with postman_api_key and postman_collection_name)"
   default     = null
 }
 
 variable "postman_api_key" {
   type        = string
-  description = "Postman API key to pull collection and environment from Postman's API"
+  description = "Postman API key to pull collection and environment from Postman's API (must be provided with postman_collection_name and postman_environment_name)"
   default     = null
 }
 

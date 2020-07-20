@@ -10,16 +10,28 @@ This lambda function will tell CodeDeploy if the tests pass or fail.
 #### [New to Terraform Modules at BYU?](https://github.com/byu-oit/terraform-documentation)
 
 ## Usage
-```hcl
-module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v0.1.0"
-    app_name                      = "simple-example"
-    postman_collection_name       = "terraform-aws-postman-test-lambda-example"
-    postman_environment_name      = "terraform-aws-postman-test-lambda-env"
-    postman_api_key               = var.postman_api_key
-    role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
-}
-```
+You can provide a postman collection and environment to be tested in one of two ways:
+1. Provided in your github repo
+    ```hcl
+    module "postman_test_lambda" {
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v0.1.0"
+        app_name                      = "simple-example"
+        postman_collection_file       = "terraform-aws-postman-test-lambda-example.postman_collection.json"
+        postman_environment_file      = "terraform-aws-postman-test-lambda-env.postman_environment.json"
+        role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
+    }
+    ```
+2. Or from the Postman API
+    ```hcl
+    module "postman_test_lambda" {
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v0.1.0"
+        app_name                      = "simple-example"
+        postman_collection_name       = "terraform-aws-postman-test-lambda-example"
+        postman_environment_name      = "terraform-aws-postman-test-lambda-env"
+        postman_api_key               = var.postman_api_key
+        role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
+    }
+    ```
 
 Then add your lambda function_name to the CodeDeploy lifecycle hook you want the postman tests to run on.
 For instance, if you're using the [fargate-api module](https://github.com/byu-oit/terraform-aws-fargate-api):
@@ -59,9 +71,11 @@ module "lambda_api" {
 | Name | Type  | Description | Default |
 | --- | --- | --- | --- |
 | app_name | string | Application name to name your postman test lambda function | |
-| postman_collection_name | string | Name of Postman collection to download from Postman API | | 
-| postman_environment_name | string | Name of Postman environment to download from Postman API | |
-| postman_api_key | string | postman API key to download collection and environment from Postman API | |
+| postman_collection_file | string | Path to the postman collection JSON file relative from terraform dir (must be provided with postman_environment_file) | null |
+| postman_environment_file | string | Path to the postman environment JSON file relative from terraform dir (must be provided with postman_collection_file) | null |
+| postman_collection_name | string | Name of Postman collection to download from Postman API  (must be provided with postman_api_key and postman_environment_name) | null | 
+| postman_environment_name | string | Name of Postman environment to download from Postman API  (must be provided with postman_api_key and postman_collection_name) | null |
+| postman_api_key | string | postman API key to download collection and environment from Postman API |  (must be provided with postman_collection_name and postman_environment_name) | null |
 | role_permissions_boundary_arn | string | ARN of the IAM Role permissions boundary to place on each IAM role created | |
 
 ## Outputs
@@ -69,3 +83,10 @@ module "lambda_api" {
 | ---  | ---  | --- |
 | lambda_function | [object](https://www.terraform.io/docs/providers/aws/r/lambda_function.html#attributes-reference) | Created lambda function that runs newman to test the `postman_collection` |
 | lambda_iam_role | [object](https://www.terraform.io/docs/providers/aws/r/iam_role.html#attributes-reference) | Created IAM role for the `lambda_function` |
+
+## Contributing
+To contribute to this terraform module make a feature branch and create a Pull Request to the `master` branch.
+
+This terraform module bakes in the lambda function code in the committed [function.zip](lambda/dist/function.zip) file.
+
+If you change the javascript in [index.js](lambda/src/index.js) then you'll need to run `npm run package` and commit the [function.zip](lambda/dist/function.zip) file.
