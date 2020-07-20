@@ -5,7 +5,7 @@ const AWS = require('aws-sdk')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
 const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
 
-const tmpDir = process.env['TMP_DIR'] ? process.env['TMP_DIR'] : '/tmp'
+const tmpDir = process.env.TMP_DIR ? process.env.TMP_DIR : '/tmp'
 
 exports.handler = async function (event, context) {
   console.log(event)
@@ -19,7 +19,6 @@ exports.handler = async function (event, context) {
     const downloadEnv = downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
     await downloadCollection
     await downloadEnv
-
   } else {
     // start downloading postman files from S3 Bucket
     const downloadCollection = downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION)

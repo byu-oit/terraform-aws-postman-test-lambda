@@ -20,12 +20,14 @@ jobs:
               {
                 "tf_working_dir":"./examples/simple",
                 "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret"
+                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "include_postman_api_key":"false"
               },
               {
                 "tf_working_dir":"./examples/postman-api",
                 "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret"
+                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "include_postman_api_key":"true"
               }
             ]
           }'
@@ -75,8 +77,14 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
+        if: ${{ matrix.env.include_postman_api_key }}
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform plan -input=false -out=plan -var 'postman_api_key=fake_api_key'
+
+      - name: Terraform Plan
+        if: ${{ !matrix.env.include_postman_api_key }}
+        working-directory: ${{ matrix.env.tf_working_dir }}
+        run: terraform plan -input=false -out=plan
 
       - name: Comment Terraform Plan
         uses: byu-oit/github-action-tf-plan-comment@v1

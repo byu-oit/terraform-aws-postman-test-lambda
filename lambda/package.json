@@ -10,7 +10,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "lint": "npx standard",
-    "zip": "zip -rj dist/function.zip dist/index.js",
     "package": "npx ncc build src/index.js -m -o dist && zip -rj dist/function.zip dist/index.js"
   },
   "author": "",
@@ -22,5 +21,10 @@
   },
   "devDependencies": {
     "@zeit/ncc": "^0.22.1"
+  },
+  "standard": {
+    "ignore": [
+      "dist/**"
+    ]
   }
 }
