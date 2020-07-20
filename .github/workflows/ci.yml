@@ -18,12 +18,12 @@ jobs:
           matrix='{
             "env":[
               {
-                "tf_working_dir":"./examples/simple-example",
+                "tf_working_dir":"./examples/simple",
                 "aws_key_name":"byu_oit_terraform_dev_key",
                 "aws_secret_name":"byu_oit_terraform_dev_secret"
               },
               {
-                "tf_working_dir":"./examples/postman-api-example",
+                "tf_working_dir":"./examples/postman-api",
                 "aws_key_name":"byu_oit_terraform_dev_key",
                 "aws_secret_name":"byu_oit_terraform_dev_secret"
               }
@@ -37,9 +37,6 @@ jobs:
   format:
     name: Terraform Format
     runs-on: ubuntu-latest
-    needs: env
-    strategy:
-      matrix: ${{ fromJson(needs.env.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v2
 

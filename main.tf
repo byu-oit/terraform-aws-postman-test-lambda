@@ -11,7 +11,7 @@ locals {
     S3_BUCKET           = aws_s3_bucket.postman_bucket[0].bucket
     POSTMAN_COLLECTION  = aws_s3_bucket_object.collection[0].key
     POSTMAN_ENVIRONMENT = aws_s3_bucket_object.environment[0].key
-  } : {
+    } : {
     POSTMAN_COLLECTION_NAME  = var.postman_collection_name
     POSTMAN_ENVIRONMENT_NAME = var.postman_environment_name
     POSTMAN_API_KEY          = var.postman_api_key
