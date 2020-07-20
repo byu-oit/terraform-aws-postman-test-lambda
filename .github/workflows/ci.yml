@@ -3,7 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [master]
-    types: [opened, reopened, synchronize, edited]
 env:
   tf_version: "0.12.26" # must match value in examples/ci/postman-api-example.tf
   TF_IN_AUTOMATION: true
