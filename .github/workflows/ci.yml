@@ -77,12 +77,12 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        if: ${{ matrix.env.include_postman_api_key }}
+        if: ${{ matrix.env.include_postman_api_key }} == true
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform plan -input=false -out=plan -var 'postman_api_key=fake_api_key'
 
       - name: Terraform Plan
-        if: ${{ !matrix.env.include_postman_api_key }}
+        if: ${{ matrix.env.include_postman_api_key }} == false
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform plan -input=false -out=plan
 
