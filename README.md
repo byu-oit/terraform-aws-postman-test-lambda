@@ -75,7 +75,7 @@ module "lambda_api" {
 | postman_environment_file | string | Path to the postman environment JSON file relative from terraform dir (must be provided with postman_collection_file) | null |
 | postman_collection_name | string | Name of Postman collection to download from Postman API  (must be provided with postman_api_key and postman_environment_name) | null | 
 | postman_environment_name | string | Name of Postman environment to download from Postman API  (must be provided with postman_api_key and postman_collection_name) | null |
-| postman_api_key | string | postman API key to download collection and environment from Postman API |  (must be provided with postman_collection_name and postman_environment_name) | null |
+| postman_api_key | string | postman API key to download collection and environment from Postman API (must be provided with postman_collection_name and postman_environment_name) | null |
 | role_permissions_boundary_arn | string | ARN of the IAM Role permissions boundary to place on each IAM role created | |
 
 ## Outputs
