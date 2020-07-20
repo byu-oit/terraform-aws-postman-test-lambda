@@ -32,6 +32,11 @@ You can provide a postman collection and environment to be tested in one of two 
         role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
     }
     ```
+   Using this method allows you to not have to export your collection and commit the JSON file to your repo.
+   
+   **Note:** The postman collection/environment must be viewable by the postman account tied to the API key you provide.
+   
+   **DON'T** hard code your postman API key, treat it like all other secrets.
 
 Then add your lambda function_name to the CodeDeploy lifecycle hook you want the postman tests to run on.
 For instance, if you're using the [fargate-api module](https://github.com/byu-oit/terraform-aws-fargate-api):
