@@ -37,3 +37,9 @@ variable "role_permissions_boundary_arn" {
   type        = string
   description = "ARN of the IAM Role permissions boundary to place on each IAM role created."
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of AWS Tags to attach to each resource created"
+  default     = {}
+}

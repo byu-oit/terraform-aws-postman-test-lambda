@@ -42,6 +42,7 @@ resource "aws_s3_bucket" "postman_bucket" {
       }
     }
   }
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_public_access_block" "default" {
@@ -60,6 +61,7 @@ resource "aws_s3_bucket_object" "collection" {
   bucket = aws_s3_bucket.postman_bucket[0].bucket
   key    = basename(var.postman_collection_file)
   source = var.postman_collection_file
+  tags   = var.tags
 }
 
 resource "aws_s3_bucket_object" "environment" {
@@ -68,6 +70,7 @@ resource "aws_s3_bucket_object" "environment" {
   bucket = aws_s3_bucket.postman_bucket[0].bucket
   key    = basename(var.postman_environment_file)
   source = var.postman_environment_file
+  tags   = var.tags
 }
 
 resource "aws_iam_policy" "s3_access" {
@@ -129,11 +132,13 @@ resource "aws_lambda_function" "test_lambda" {
   environment {
     variables = local.lambda_env_variables
   }
+  tags = var.tags
 }
 
 resource "aws_iam_role" "test_lambda" {
   name                 = "${var.app_name}-postman-tests"
   permissions_boundary = var.role_permissions_boundary_arn
+  tags                 = var.tags
 
   assume_role_policy = <<EOF
 {
