@@ -1,11 +1,11 @@
-const util = require('util')
 const fetch = require('node-fetch')
 const fs = require('fs')
-const streamPipeline = util.promisify(require('stream').pipeline)
 const newman = require('newman')
 const AWS = require('aws-sdk')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
 const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
+
+const tmpDir = process.env['TMP_DIR'] ? process.env['TMP_DIR'] : '/tmp'
 
 exports.handler = async function (event, context) {
   console.log(event)
@@ -30,8 +30,8 @@ exports.handler = async function (event, context) {
 
   let errorFromTests
   const postmanTests = runTests(
-    './collection.json',
-    './environment.json'
+    `${tmpDir}/collection.json`,
+    `${tmpDir}/environment.json`
   ).catch(err => { errorFromTests = err })
 
   await postmanTests
@@ -60,7 +60,7 @@ exports.handler = async function (event, context) {
 }
 
 async function downloadFileFromPostman (type, name) {
-  console.log(`started download for ./${type}.json`)
+  console.log(`started download for ${tmpDir}/${type}.json`)
   try {
     const response = await fetch(`https://api.getpostman.com/${type}s`, {
       method: 'GET',
@@ -82,8 +82,8 @@ async function downloadFileFromPostman (type, name) {
         'X-Api-Key': process.env.POSTMAN_API_KEY
       }
     })
-    fs.writeFileSync(`./${type}.json`, await actualResponse.json())
-    console.log(`downloaded ./${type}.json`)
+    fs.writeFileSync(`${tmpDir}/${type}.json`, JSON.stringify(await actualResponse.json()))
+    console.log(`downloaded ${tmpDir}/${type}.json`)
   } catch (error) {
     console.error('Error in fetch', error)
   }
@@ -101,8 +101,8 @@ function downloadFileFromBucket (type, key) {
           console.error(`error trying to get object from bucket: ${err}`)
           reject(err)
         } else {
-          fs.writeFileSync(`./${type}.json`, data.Body.toString())
-          console.log(`downloaded ./${type}.json`)
+          fs.writeFileSync(`${tmpDir}/${type}.json`, data.Body.toString())
+          console.log(`downloaded ${tmpDir}/${type}.json`)
           resolve()
         }
       })
@@ -140,5 +140,4 @@ function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// runTests('../../../.postman')
-exports.handler({}, {})
+// exports.handler({}, {})

@@ -104,6 +104,13 @@ resource "aws_iam_policy" "s3_access" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  count = local.using_local_files ? 1 : 0
+
+  policy_arn = aws_iam_policy.s3_access[0].arn
+  role       = aws_iam_role.test_lambda.name
+}
+
 # -----------------------------------------------------------------------------
 # END OF LOCAL FILES
 # -----------------------------------------------------------------------------
@@ -115,7 +122,7 @@ resource "aws_lambda_function" "test_lambda" {
   filename         = "${path.module}/lambda/dist/function.zip"
   function_name    = "${var.app_name}-postman-tests"
   role             = aws_iam_role.test_lambda.arn
-  handler          = "src/index.handler"
+  handler          = "index.handler"
   runtime          = "nodejs12.x"
   timeout          = 30
   source_code_hash = base64sha256("${path.module}/lambda/dist/function.zip")
