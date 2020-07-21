@@ -86,6 +86,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: ${{ matrix.env.tf_working_dir }}
           terraform-plan-file: plan
+          comment-title: Terraform Plan for ${{ matrix.env.tf_working_dir }}
 
   build:
     name: Build
