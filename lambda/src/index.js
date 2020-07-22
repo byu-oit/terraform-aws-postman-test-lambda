@@ -1,5 +1,5 @@
 const fetch = require('node-fetch')
-const fs = require('fs')
+const fs = require('fs/promises')
 const newman = require('newman')
 const AWS = require('aws-sdk')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
@@ -81,7 +81,7 @@ async function downloadFileFromPostman (type, name) {
         'X-Api-Key': process.env.POSTMAN_API_KEY
       }
     })
-    fs.writeFileSync(`${tmpDir}/${type}.json`, await actualResponse.text())
+    await fs.writeFile(`${tmpDir}/${type}.json`, await actualResponse.text())
     console.log(`downloaded ${tmpDir}/${type}.json`)
   } catch (error) {
     console.error('Error in fetch', error)
@@ -102,7 +102,7 @@ async function downloadFileFromBucket (type, key) {
     throw err
   }
 
-  fs.writeFileSync(`${tmpDir}/${type}.json`, data.Body.toString())
+  await fs.writeFile(`${tmpDir}/${type}.json`, data.Body.toString())
   console.log(`downloaded ${tmpDir}/${type}.json`)
 }
 
