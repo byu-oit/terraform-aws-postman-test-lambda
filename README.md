@@ -75,7 +75,7 @@ module "lambda_api" {
 ## Inputs
 | Name | Type  | Description | Default |
 | --- | --- | --- | --- |
-| app_name | string | Application name to name your postman test lambda function | |
+| app_name | string | Application name to prefix your postman test lambda function's name | |
 | postman_collection_file | string | Path to the postman collection JSON file relative from terraform dir (must be provided with postman_environment_file) | null |
 | postman_environment_file | string | Path to the postman environment JSON file relative from terraform dir (must be provided with postman_collection_file) | null |
 | postman_collection_name | string | Name of Postman collection to download from Postman API  (must be provided with postman_api_key and postman_environment_name) | null | 
