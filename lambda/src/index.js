@@ -14,26 +14,25 @@ exports.handler = async function (event, context) {
   const timer = sleep(10000)
 
   if (process.env.POSTMAN_API_KEY) {
-    // start downloading postman files from Postman API
-    const downloadCollection = downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME)
-    const downloadEnv = downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
-    await downloadCollection
-    await downloadEnv
+    // download postman files from Postman API
+    await Promise.all([
+      downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME),
+      downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
+    ])
   } else {
-    // start downloading postman files from S3 Bucket
-    const downloadCollection = downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION)
-    const downloadEnv = downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
-    await downloadCollection
-    await downloadEnv
+    // download postman files from S3 Bucket
+    await Promise.all([
+      downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION),
+      downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
+    ])
   }
 
   let errorFromTests
-  const postmanTests = runTests(
+  await runTests(
     `${tmpDir}/collection.json`,
     `${tmpDir}/environment.json`
   ).catch(err => { errorFromTests = err })
 
-  await postmanTests
   await timer
 
   const deploymentId = event.DeploymentId
