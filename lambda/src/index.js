@@ -88,28 +88,22 @@ async function downloadFileFromPostman (type, name) {
   }
 }
 
-function downloadFileFromBucket (type, key) {
+async function downloadFileFromBucket (type, key) {
   console.log(`started download for ${type} with key ${key} from s3 bucket`)
+
+  let data
   try {
-    return new Promise((resolve, reject) => {
-      s3.getObject({
-        Bucket: process.env.S3_BUCKET,
-        Key: key
-      }, (err, data) => {
-        if (err) {
-          console.error(`error trying to get object from bucket: ${err}`)
-          reject(err)
-        } else {
-          fs.writeFileSync(`${tmpDir}/${type}.json`, data.Body.toString())
-          console.log(`downloaded ${tmpDir}/${type}.json`)
-          resolve()
-        }
-      })
-    })
+    data = await s3.getObject({
+      Bucket: process.env.S3_BUCKET,
+      Key: key
+    }).promise()
   } catch (err) {
-    console.log(err)
+    console.error(`error trying to get object from bucket: ${err}`)
     throw err
   }
+
+  fs.writeFileSync(`${tmpDir}/${type}.json`, data.Body.toString())
+  console.log(`downloaded ${tmpDir}/${type}.json`)
 }
 
 function newmanRun (options) {
