@@ -1,11 +1,13 @@
 const fetch = require('node-fetch')
 const fs = require('fs/promises')
+const os = require('os')
+const { sep } = require('path')
 const newman = require('newman')
 const AWS = require('aws-sdk')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
 const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
 
-const tmpDir = process.env.TMP_DIR ? process.env.TMP_DIR : '/tmp'
+const tmpDir = process.env.TMP_DIR || os.tmpdir()
 
 exports.handler = async function (event, context) {
   console.log(event)
@@ -29,8 +31,8 @@ exports.handler = async function (event, context) {
 
   let errorFromTests
   await runTests(
-    `${tmpDir}/collection.json`,
-    `${tmpDir}/environment.json`
+    `${tmpDir}${sep}collection.json`,
+    `${tmpDir}${sep}environment.json`
   ).catch(err => { errorFromTests = err })
 
   await timer
@@ -58,7 +60,8 @@ exports.handler = async function (event, context) {
 }
 
 async function downloadFileFromPostman (type, name) {
-  console.log(`started download for ${tmpDir}/${type}.json`)
+  const filename = `${tmpDir}${sep}${type}.json`
+  console.log(`started download for ${filename}`)
   try {
     const response = await fetch(`https://api.getpostman.com/${type}s`, {
       method: 'GET',
@@ -76,14 +79,15 @@ async function downloadFileFromPostman (type, name) {
         'X-Api-Key': process.env.POSTMAN_API_KEY
       }
     })
-    await fs.writeFile(`${tmpDir}/${type}.json`, await actualResponse.text())
-    console.log(`downloaded ${tmpDir}/${type}.json`)
+    await fs.writeFile(filename, await actualResponse.text())
+    console.log(`downloaded ${filename}`)
   } catch (error) {
     console.error('Error in fetch', error)
   }
 }
 
 async function downloadFileFromBucket (type, key) {
+  const filename = `${tmpDir}${sep}${type}.json`
   console.log(`started download for ${type} with key ${key} from s3 bucket`)
 
   let data
@@ -97,8 +101,8 @@ async function downloadFileFromBucket (type, key) {
     throw err
   }
 
-  await fs.writeFile(`${tmpDir}/${type}.json`, data.Body.toString())
-  console.log(`downloaded ${tmpDir}/${type}.json`)
+  await fs.writeFile(filename, data.Body.toString())
+  console.log(`downloaded ${filename}`)
 }
 
 function newmanRun (options) {
