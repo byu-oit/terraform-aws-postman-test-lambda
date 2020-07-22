@@ -3,9 +3,9 @@ name: CI
 on:
   pull_request:
     branches: [master]
-    types: [opened, reopened, synchronize, edited]
 env:
-  tf_version: "0.12.26" # must match value in examples/ci/ci.tf
+  tf_version: "0.12.26" # must match value in examples/ci/postman-api-example.tf
+  TF_IN_AUTOMATION: true
 
 jobs:
   env:
@@ -18,9 +18,16 @@ jobs:
           matrix='{
             "env":[
               {
-                "tf_working_dir":"./examples/ci",
+                "tf_working_dir":"./examples/simple",
                 "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret"
+                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "tf_plan_extra_args":""
+              },
+              {
+                "tf_working_dir":"./examples/postman-api",
+                "aws_key_name":"byu_oit_terraform_dev_key",
+                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "tf_plan_extra_args":"-var 'postman_api_key=fake_api_key'"
               }
             ]
           }'
@@ -32,9 +39,6 @@ jobs:
   format:
     name: Terraform Format
     runs-on: ubuntu-latest
-    needs: env
-    strategy:
-      matrix: ${{ fromJson(needs.env.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v2
 
@@ -74,7 +78,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false -out=plan
+        run: terraform plan -input=false -out=plan ${{ matrix.env.tf_plan_extra_args }}
 
       - name: Comment Terraform Plan
         uses: byu-oit/github-action-tf-plan-comment@v1
@@ -82,6 +86,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: ${{ matrix.env.tf_working_dir }}
           terraform-plan-file: plan
+          comment-title: Terraform Plan for ${{ matrix.env.tf_working_dir }}
 
   build:
     name: Build

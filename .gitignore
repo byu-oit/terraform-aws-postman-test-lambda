@@ -19,3 +19,6 @@ override.tf.json
 .idea
 
 node_modules
+
+# Ignore the generated minified index.js since it's bundled inside of the dist/function.zip file
+/lambda/dist/index.js

@@ -9,12 +9,22 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "lint": "npx standard"
+    "lint": "npx standard",
+    "package": "npx ncc build src/index.js -m -o dist && zip -rj dist/function.zip dist/index.js"
   },
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.676.0",
-    "newman": "^5.0.0"
+    "newman": "^5.1.2",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.22.1"
+  },
+  "standard": {
+    "ignore": [
+      "dist/**"
+    ]
   }
 }
