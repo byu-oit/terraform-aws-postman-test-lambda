@@ -81,7 +81,7 @@ async function downloadFileFromPostman (type, name) {
         'X-Api-Key': process.env.POSTMAN_API_KEY
       }
     })
-    fs.writeFileSync(`${tmpDir}/${type}.json`, JSON.stringify(await actualResponse.json()))
+    fs.writeFileSync(`${tmpDir}/${type}.json`, await actualResponse.text())
     console.log(`downloaded ${tmpDir}/${type}.json`)
   } catch (error) {
     console.error('Error in fetch', error)
