@@ -1,5 +1,5 @@
 const fetch = require('node-fetch')
-const fs = require('fs/promises')
+const fs = require('fs').promises
 const os = require('os')
 const { sep } = require('path')
 const newman = require('newman')
