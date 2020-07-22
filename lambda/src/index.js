@@ -67,12 +67,8 @@ async function downloadFileFromPostman (type, name) {
       }
     })
     const json = await response.json()
-    // console.log(JSON.stringify(json))
     const list = json[`${type}s`]
-    // console.log(JSON.stringify(list))
-    const found = list.find(c => c.name === name)
-    // console.log(JSON.stringify(found))
-    const uid = found.uid
+    const { uid } = list.find(entry => entry.name === name)
 
     const actualResponse = await fetch(`https://api.getpostman.com/${type}s/${uid}`, {
       method: 'GET',
