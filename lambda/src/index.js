@@ -15,30 +15,31 @@ exports.handler = async function (event, context) {
   // Give the ALB 10 seconds to make sure the test TG has switched to the new code.
   const timer = sleep(10000)
 
-  let errorFromDownloads
+  // store the error so that we can update codedeploy lifecycle if there are any errors including errors from downloading files
+  let error
   if (process.env.POSTMAN_API_KEY) {
     // download postman files from Postman API
     await Promise.all([
       downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME),
       downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
-    ]).catch(err => { errorFromDownloads = err })
+    ]).catch(err => { error = err })
   } else {
     // download postman files from S3 Bucket
     await Promise.all([
       downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION),
       downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
-    ]).catch(err => { errorFromDownloads = err })
+    ]).catch(err => { error = err })
   }
 
-  if (errorFromDownloads) throw errorFromDownloads // cause lambda to fail if collection/env failed to download to lambda
-
-  let errorFromTests
-  await runTests(
-    `${tmpDir}${sep}collection.json`,
-    `${tmpDir}${sep}environment.json`
-  ).catch(err => { errorFromTests = err })
-
+  // finish the 10 second timer before trying to run the postman tests
   await timer
+  if (!error) {
+    // no need to run tests if files weren't downloaded correctly
+    await runTests(
+      `${tmpDir}${sep}collection.json`,
+      `${tmpDir}${sep}environment.json`
+    ).catch(err => { error = err })
+  }
 
   const deploymentId = event.DeploymentId
   if (deploymentId) {
@@ -46,7 +47,7 @@ exports.handler = async function (event, context) {
     const params = {
       deploymentId: event.DeploymentId,
       lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
-      status: errorFromTests ? 'Failed' : 'Succeeded'
+      status: error ? 'Failed' : 'Succeeded'
     }
     try {
       const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
@@ -59,7 +60,7 @@ exports.handler = async function (event, context) {
     console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
   }
 
-  if (errorFromTests) throw errorFromTests // Cause the lambda to "fail"
+  if (error) throw error // Cause the lambda to "fail"
 }
 
 async function downloadFileFromPostman (type, name) {
@@ -138,4 +139,4 @@ function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// exports.handler({}, {})
+exports.handler({}, {})
