@@ -15,19 +15,22 @@ exports.handler = async function (event, context) {
   // Give the ALB 10 seconds to make sure the test TG has switched to the new code.
   const timer = sleep(10000)
 
+  let errorFromDownloads
   if (process.env.POSTMAN_API_KEY) {
     // download postman files from Postman API
     await Promise.all([
       downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME),
       downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
-    ])
+    ]).catch(err => { errorFromDownloads = err })
   } else {
     // download postman files from S3 Bucket
     await Promise.all([
       downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION),
       downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
-    ])
+    ]).catch(err => { errorFromDownloads = err })
   }
+
+  if (errorFromDownloads) throw errorFromDownloads // cause lambda to fail if collection/env failed to download to lambda
 
   let errorFromTests
   await runTests(
@@ -62,17 +65,22 @@ exports.handler = async function (event, context) {
 async function downloadFileFromPostman (type, name) {
   const filename = `${tmpDir}${sep}${type}.json`
   console.log(`started download for ${filename}`)
-  try {
-    const response = await fetch(`https://api.getpostman.com/${type}s`, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': process.env.POSTMAN_API_KEY
-      }
-    })
-    const json = await response.json()
-    const list = json[`${type}s`]
-    const { uid } = list.find(entry => entry.name === name)
-
+  const response = await fetch(`https://api.getpostman.com/${type}s`, {
+    method: 'GET',
+    headers: {
+      'X-Api-Key': process.env.POSTMAN_API_KEY
+    }
+  })
+  const json = await response.json()
+  const list = json[`${type}s`]
+  const found = list.filter(entry => entry.name === name)
+  if (found.length > 1) {
+    throw Error(`More than 1 ${type} files found with name '${name}'. Please make your ${type}'s name is unique.`)
+  } else if (found.length === 0) {
+    throw Error(`No ${type} found with name '${name}'.`)
+  } else {
+    const uid = found[0].uid
+    console.log(`Found uid (${uid}) for ${type} with name = ${name}`)
     const actualResponse = await fetch(`https://api.getpostman.com/${type}s/${uid}`, {
       method: 'GET',
       headers: {
@@ -81,8 +89,6 @@ async function downloadFileFromPostman (type, name) {
     })
     await fs.writeFile(filename, await actualResponse.text())
     console.log(`downloaded ${filename}`)
-  } catch (error) {
-    console.error('Error in fetch', error)
   }
 }
 
