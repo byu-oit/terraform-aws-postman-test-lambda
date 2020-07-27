@@ -15,27 +15,31 @@ exports.handler = async function (event, context) {
   // Give the ALB 10 seconds to make sure the test TG has switched to the new code.
   const timer = sleep(10000)
 
+  // store the error so that we can update codedeploy lifecycle if there are any errors including errors from downloading files
+  let error
   if (process.env.POSTMAN_API_KEY) {
     // download postman files from Postman API
     await Promise.all([
       downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME),
       downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
-    ])
+    ]).catch(err => { error = err })
   } else {
     // download postman files from S3 Bucket
     await Promise.all([
       downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION),
       downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
-    ])
+    ]).catch(err => { error = err })
   }
 
-  let errorFromTests
-  await runTests(
-    `${tmpDir}${sep}collection.json`,
-    `${tmpDir}${sep}environment.json`
-  ).catch(err => { errorFromTests = err })
-
+  // finish the 10 second timer before trying to run the postman tests
   await timer
+  if (!error) {
+    // no need to run tests if files weren't downloaded correctly
+    await runTests(
+      `${tmpDir}${sep}collection.json`,
+      `${tmpDir}${sep}environment.json`
+    ).catch(err => { error = err })
+  }
 
   const deploymentId = event.DeploymentId
   if (deploymentId) {
@@ -43,7 +47,7 @@ exports.handler = async function (event, context) {
     const params = {
       deploymentId: event.DeploymentId,
       lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
-      status: errorFromTests ? 'Failed' : 'Succeeded'
+      status: error ? 'Failed' : 'Succeeded'
     }
     try {
       const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
@@ -56,23 +60,28 @@ exports.handler = async function (event, context) {
     console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
   }
 
-  if (errorFromTests) throw errorFromTests // Cause the lambda to "fail"
+  if (error) throw error // Cause the lambda to "fail"
 }
 
 async function downloadFileFromPostman (type, name) {
   const filename = `${tmpDir}${sep}${type}.json`
   console.log(`started download for ${filename}`)
-  try {
-    const response = await fetch(`https://api.getpostman.com/${type}s`, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': process.env.POSTMAN_API_KEY
-      }
-    })
-    const json = await response.json()
-    const list = json[`${type}s`]
-    const { uid } = list.find(entry => entry.name === name)
-
+  const response = await fetch(`https://api.getpostman.com/${type}s`, {
+    method: 'GET',
+    headers: {
+      'X-Api-Key': process.env.POSTMAN_API_KEY
+    }
+  })
+  const json = await response.json()
+  const list = json[`${type}s`]
+  const found = list.filter(entry => entry.name === name)
+  if (found.length > 1) {
+    throw Error(`More than 1 ${type} files found with name '${name}'. Please make your ${type}'s name is unique.`)
+  } else if (found.length === 0) {
+    throw Error(`No ${type} found with name '${name}'.`)
+  } else {
+    const uid = found[0].uid
+    console.log(`Found uid (${uid}) for ${type} with name = ${name}`)
     const actualResponse = await fetch(`https://api.getpostman.com/${type}s/${uid}`, {
       method: 'GET',
       headers: {
@@ -81,8 +90,6 @@ async function downloadFileFromPostman (type, name) {
     })
     await fs.writeFile(filename, await actualResponse.text())
     console.log(`downloaded ${filename}`)
-  } catch (error) {
-    console.error('Error in fetch', error)
   }
 }
 
