@@ -98,3 +98,9 @@ To contribute to this terraform module make a feature branch and create a Pull R
 This terraform module bakes in the lambda function code in the committed [function.zip](lambda/dist/function.zip) file.
 
 If you change the [index.js](lambda/src/index.js) file then you'll need to run `npm run package` and commit the [function.zip](lambda/dist/function.zip) file.
+
+## Developing
+
+### Release new version
+
+To release a new version, update the examples in the `examples` folder, the example in this README, and the number in the version file. Pushing to `master` will automatically create a new release and tag in GitHub.

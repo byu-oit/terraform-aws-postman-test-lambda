@@ -1,0 +1,29 @@
+name: Release New Version
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create new GitHub tag
+          id: new_tag
+          uses: butlerlogic/action-autotag@stable
+          with:
+            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+            strategy: regex
+            root: "version"
+            regex_pattern: "^\d\.\d\.\d$" # Regex for Semver. Example: x.y.z
+            tag_prefix: "v"
+      - name: Create GitHub release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: ${{ steps.new_tag.outputs.tagname }}
+            release_name: Release ${{ steps.new_tag.outputs.tagname }}
+            draft: false
