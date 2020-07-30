@@ -5,3 +5,7 @@ update_configs:
     update_schedule: "weekly"
     default_reviewers:
       - yoshutch
+    ignored_updates:
+      - match:
+          dependency_name: "aws-sdk"
+          version_requirement: "2.x"
