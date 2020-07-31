@@ -61,6 +61,7 @@ resource "aws_s3_bucket_object" "collection" {
   bucket = aws_s3_bucket.postman_bucket[0].bucket
   key    = basename(var.postman_collection_file)
   source = var.postman_collection_file
+  etag   = filemd5(var.postman_collection_file)
   tags   = var.tags
 }
 
@@ -70,6 +71,7 @@ resource "aws_s3_bucket_object" "environment" {
   bucket = aws_s3_bucket.postman_bucket[0].bucket
   key    = basename(var.postman_environment_file)
   source = var.postman_environment_file
+  etag   = filemd5(var.postman_environment_file)
   tags   = var.tags
 }
 

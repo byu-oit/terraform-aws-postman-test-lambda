@@ -14,7 +14,7 @@ You can provide a postman collection and environment to be tested in one of two 
 1. Provided in your github repo
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v1.0.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v1.0.1"
         app_name                      = "simple-example"
         postman_collection_file       = "terraform-aws-postman-test-lambda-example.postman_collection.json"
         postman_environment_file      = "terraform-aws-postman-test-lambda-env.postman_environment.json"
@@ -24,7 +24,7 @@ You can provide a postman collection and environment to be tested in one of two 
 2. Or from the Postman API
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v1.0.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v1.0.1"
         app_name                      = "simple-example"
         postman_collection_name       = "terraform-aws-postman-test-lambda-example"
         postman_environment_name      = "terraform-aws-postman-test-lambda-env"
@@ -75,22 +75,22 @@ module "lambda_api" {
 * Terraform version 0.12.16 or greater
 
 ## Inputs
-| Name | Type  | Description | Default |
-| --- | --- | --- | --- |
-| app_name | string | Application name to prefix your postman test lambda function's name | |
-| postman_collection_file | string | Path to the postman collection JSON file relative from terraform dir (must be provided with postman_environment_file) | null |
-| postman_environment_file | string | Path to the postman environment JSON file relative from terraform dir (must be provided with postman_collection_file) | null |
-| postman_collection_name | string | Name of Postman collection to download from Postman API  (must be provided with postman_api_key and postman_environment_name) | null | 
-| postman_environment_name | string | Name of Postman environment to download from Postman API  (must be provided with postman_api_key and postman_collection_name) | null |
-| postman_api_key | string | postman API key to download collection and environment from Postman API (must be provided with postman_collection_name and postman_environment_name) | null |
-| role_permissions_boundary_arn | string | ARN of the IAM Role permissions boundary to place on each IAM role created | |
-| tags | map(string) | A map of AWS Tags to attach to each resource created | {} |
+| Name                          | Type        | Description                                                                                                                                          | Default |
+| ----------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| app_name                      | string      | Application name to prefix your postman test lambda function's name                                                                                  |         |
+| postman_collection_file       | string      | Path to the postman collection JSON file relative from terraform dir (must be provided with postman_environment_file)                                | null    |
+| postman_environment_file      | string      | Path to the postman environment JSON file relative from terraform dir (must be provided with postman_collection_file)                                | null    |
+| postman_collection_name       | string      | Name of Postman collection to download from Postman API  (must be provided with postman_api_key and postman_environment_name)                        | null    |
+| postman_environment_name      | string      | Name of Postman environment to download from Postman API  (must be provided with postman_api_key and postman_collection_name)                        | null    |
+| postman_api_key               | string      | postman API key to download collection and environment from Postman API (must be provided with postman_collection_name and postman_environment_name) | null    |
+| role_permissions_boundary_arn | string      | ARN of the IAM Role permissions boundary to place on each IAM role created                                                                           |         |
+| tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                 | {}      |
 
 ## Outputs
-| Name | Type | Description |
-| ---  | ---  | --- |
+| Name            | Type                                                                                              | Description                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | lambda_function | [object](https://www.terraform.io/docs/providers/aws/r/lambda_function.html#attributes-reference) | Created lambda function that runs newman to test the `postman_collection` |
-| lambda_iam_role | [object](https://www.terraform.io/docs/providers/aws/r/iam_role.html#attributes-reference) | Created IAM role for the `lambda_function` |
+| lambda_iam_role | [object](https://www.terraform.io/docs/providers/aws/r/iam_role.html#attributes-reference)        | Created IAM role for the `lambda_function`                                |
 
 ## Contributing
 To contribute to this terraform module make a feature branch and create a Pull Request to the `master` branch.
