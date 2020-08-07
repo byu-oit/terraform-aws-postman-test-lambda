@@ -34,6 +34,11 @@ resource "aws_s3_bucket" "postman_bucket" {
     id                                     = "AutoAbortFailedMultipartUpload"
     enabled                                = true
     abort_incomplete_multipart_upload_days = 10
+
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = false
+    }
   }
   server_side_encryption_configuration {
     rule {
