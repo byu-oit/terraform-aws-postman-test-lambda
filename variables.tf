@@ -15,6 +15,12 @@ variable "postman_environment_file" {
   default     = null
 }
 
+variable "postman_files_bucket_name" {
+  type        = string
+  description = "S3 Bucket name for the S3 Bucket this module will upload the postman_collection_file and postman_environment_file to (defaults to <app_name>-postman-files)"
+  default     = null
+}
+
 variable "postman_collection_name" {
   type        = string
   description = "Name of Postman collection to download from Postman API (must be provided with postman_api_key and postman_environment_name)"
