@@ -44,6 +44,12 @@ variable "role_permissions_boundary_arn" {
   description = "ARN of the IAM Role permissions boundary to place on each IAM role created."
 }
 
+variable "log_retention_in_days" {
+  type        = number
+  description = "CloudWatch log group retention in days. Defaults to 7."
+  default     = 7
+}
+
 variable "tags" {
   type        = map(string)
   description = "A map of AWS Tags to attach to each resource created"

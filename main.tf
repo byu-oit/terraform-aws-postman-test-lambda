@@ -16,6 +16,7 @@ locals {
     POSTMAN_ENVIRONMENT_NAME = var.postman_environment_name
     POSTMAN_API_KEY          = var.postman_api_key
   }
+  lambda_function_name = "${var.app_name}-postman-tests"
 }
 
 # -----------------------------------------------------------------------------
@@ -120,7 +121,6 @@ resource "aws_iam_role_policy_attachment" "s3_access" {
   policy_arn = aws_iam_policy.s3_access[0].arn
   role       = aws_iam_role.test_lambda.name
 }
-
 # -----------------------------------------------------------------------------
 # END OF LOCAL FILES
 # -----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ resource "aws_iam_role_policy_attachment" "s3_access" {
 # -----------------------------------------------------------------------------
 resource "aws_lambda_function" "test_lambda" {
   filename         = "${path.module}/lambda/dist/function.zip"
-  function_name    = "${var.app_name}-postman-tests"
+  function_name    = local.lambda_function_name
   role             = aws_iam_role.test_lambda.arn
   handler          = "index.handler"
   runtime          = "nodejs12.x"
@@ -140,6 +140,10 @@ resource "aws_lambda_function" "test_lambda" {
     variables = local.lambda_env_variables
   }
   tags = var.tags
+
+  depends_on = [
+    aws_cloudwatch_log_group.lambda_logs,
+  ]
 }
 
 resource "aws_iam_role" "test_lambda" {
@@ -191,6 +195,11 @@ resource "aws_iam_role_policy" "test_lambda" {
 EOF
 }
 
+resource "aws_cloudwatch_log_group" "lambda_logs" {
+  name              = "/aws/lambda/${local.lambda_function_name}"
+  retention_in_days = var.log_retention_in_days
+  tags              = var.tags
+}
 # -----------------------------------------------------------------------------
-# END OF LOCAL FILES
+# END OF LAMBDA FUNCTION
 # -----------------------------------------------------------------------------
