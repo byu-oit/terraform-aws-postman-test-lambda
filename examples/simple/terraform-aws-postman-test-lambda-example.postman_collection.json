@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "f49e7563-d035-4164-baa9-0e77af3c6221",
 		"name": "terraform-aws-postman-test-lambda-example",
-		"schema": "https://schema.getpostman.com/json/collection/v2.2.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
