@@ -87,6 +87,8 @@ module "lambda_api" {
 | role_permissions_boundary_arn | string      | ARN of the IAM Role permissions boundary to place on each IAM role created                                                                           |         |
 | log_retention_in_days         | number      | CloudWatch log group retention in days                                                                                                               | 7       |
 | tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                 | {}      |
+| timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                | 30      |
+| memory_size                   | number      | The size of the memory of the lambda                                                                               | 128     |
 
 ## Outputs
 | Name            | Type                                                                                              | Description                                                               |
