@@ -55,3 +55,15 @@ variable "tags" {
   description = "A map of AWS Tags to attach to each resource created"
   default     = {}
 }
+
+variable "memory_size" {
+  type        = number
+  description = "the size of memory for the lambda"
+  default     = 128
+}
+
+variable "timeout" {
+  type        = number
+  description = "the amount of time the lambda is allowed to run for"
+  default     = 30
+}

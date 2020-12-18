@@ -14,7 +14,7 @@ You can provide a postman collection and environment to be tested in one of two 
 1. Provided in your github repo
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.2.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.3.0"
         app_name                      = "simple-example"
         postman_collection_file       = "terraform-aws-postman-test-lambda-example.postman_collection.json"
         postman_environment_file      = "terraform-aws-postman-test-lambda-env.postman_environment.json"
@@ -24,7 +24,7 @@ You can provide a postman collection and environment to be tested in one of two 
 2. Or from the Postman API
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.2.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.3.0"
         app_name                      = "simple-example"
         postman_collection_name       = "terraform-aws-postman-test-lambda-example"
         postman_environment_name      = "terraform-aws-postman-test-lambda-env"
@@ -87,6 +87,8 @@ module "lambda_api" {
 | role_permissions_boundary_arn | string      | ARN of the IAM Role permissions boundary to place on each IAM role created                                                                           |         |
 | log_retention_in_days         | number      | CloudWatch log group retention in days                                                                                                               | 7       |
 | tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                 | {}      |
+| timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                | 30      |
+| memory_size                   | number      | The size of the memory of the lambda                                                                               | 128     |
 
 ## Outputs
 | Name            | Type                                                                                              | Description                                                               |

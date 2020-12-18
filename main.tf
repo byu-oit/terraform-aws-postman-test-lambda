@@ -134,7 +134,8 @@ resource "aws_lambda_function" "test_lambda" {
   role             = aws_iam_role.test_lambda.arn
   handler          = "index.handler"
   runtime          = "nodejs12.x"
-  timeout          = 30
+  timeout          = var.timeout
+  memory_size      = var.memory_size
   source_code_hash = base64sha256("${path.module}/lambda/dist/function.zip")
   environment {
     variables = local.lambda_env_variables
