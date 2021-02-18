@@ -39,7 +39,7 @@ resource "aws_s3_bucket" "postman_bucket" {
 
   bucket = var.postman_files_bucket_name != null ? var.postman_files_bucket_name : "${var.app_name}-postman-files"
   logging {
-    target_bucket = aws_s3_bucket.postman_bucket_logs.id
+    target_bucket = aws_s3_bucket.postman_bucket_logs[0].id
     target_prefix = "log/"
   }
   lifecycle_rule {
