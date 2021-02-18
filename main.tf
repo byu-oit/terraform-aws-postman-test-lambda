@@ -33,6 +33,24 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
   bucket = "${var.app_name}-postman-tests-${data.aws_caller_identity.current.account_id}-logs"
   acl    = "log-delivery-write"
   tags   = var.tags
+
+  lifecycle_rule {
+    id                                     = "AutoAbortFailedMultipartUpload"
+    enabled                                = true
+    abort_incomplete_multipart_upload_days = 10
+
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = false
+    }
+  }
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket" "postman_bucket" {
