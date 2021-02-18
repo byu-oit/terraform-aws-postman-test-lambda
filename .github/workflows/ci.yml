@@ -80,6 +80,13 @@ jobs:
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform plan -input=false -out=plan ${{ matrix.env.tf_plan_extra_args }}
 
+      - name: Analyze Terraform Plan
+        uses: byu-oit/github-action-tf-plan-analyzer@v2.0.2
+        with:
+          divvycloud-username: ${{ secrets.DIVVYCLOUD_USERNAME }}
+          divvycloud-password: ${{ secrets.DIVVYCLOUD_PASSWORD }}
+          terraform-plan-file: plan # relative to working directory
+
       - name: Comment Terraform Plan
         uses: byu-oit/github-action-tf-plan-comment@v1
         with:
