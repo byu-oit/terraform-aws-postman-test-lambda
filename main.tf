@@ -25,13 +25,14 @@ locals {
 # pulled down into the function
 # -----------------------------------------------------------------------------
 
-data aws_caller_identity "current" {}
+data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "postman_bucket_logs" {
   count = local.using_local_files ? 1 : 0
 
   bucket = "${var.app_name}-postman-tests-${data.aws_caller_identity.current.account_id}-logs"
   acl    = "log-delivery-write"
+  tags   = var.tags
 }
 
 resource "aws_s3_bucket" "postman_bucket" {
