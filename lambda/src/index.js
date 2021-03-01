@@ -59,7 +59,7 @@ exports.handler = async function (event, context) {
     }
   } else if (combinedRunner) {
     return {
-      'passed': !error
+      passed: !error
     }
   } else {
     console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
