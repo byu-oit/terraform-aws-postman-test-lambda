@@ -42,6 +42,7 @@ exports.handler = async function (event, context) {
   }
 
   const deploymentId = event.DeploymentId
+  const combinedRunner = event.Combined
   if (deploymentId) {
     console.log('starting to update CodeDeploy lifecycle event hook status...')
     const params = {
@@ -55,6 +56,10 @@ exports.handler = async function (event, context) {
     } catch (err) {
       console.log(err, err.stack)
       throw err
+    }
+  } else if (combinedRunner) {
+    return {
+      passed: !error
     }
   } else {
     console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
