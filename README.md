@@ -14,7 +14,7 @@ You can provide a postman collection and environment to be tested in one of two 
 1. Provided in your github repo
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.4.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.4.1"
         app_name                      = "simple-example"
         postman_collection_file       = "terraform-aws-postman-test-lambda-example.postman_collection.json"
         postman_environment_file      = "terraform-aws-postman-test-lambda-env.postman_environment.json"
@@ -24,7 +24,7 @@ You can provide a postman collection and environment to be tested in one of two 
 2. Or from the Postman API
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.4.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.4.1"
         app_name                      = "simple-example"
         postman_collection_name       = "terraform-aws-postman-test-lambda-example"
         postman_environment_name      = "terraform-aws-postman-test-lambda-env"
@@ -33,11 +33,11 @@ You can provide a postman collection and environment to be tested in one of two 
     }
     ```
    Using this method allows you to not have to export your collection and commit the JSON file to your repo.
-   
+
    **Note:** The postman collection/environment must be viewable by the postman account tied to the API key you provide.
-   
+
    **Note 2:** Make sure your postman collection/environment names are unique, otherwise you will get an error if the postman API finds more than 1 collection/environment with the same name.
-   
+
    **DON'T** hard code your postman API key, treat it like all other secrets.
 
 Then add your lambda function_name to the CodeDeploy lifecycle hook you want the postman tests to run on.
