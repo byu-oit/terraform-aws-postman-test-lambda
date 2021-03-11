@@ -14,11 +14,11 @@ locals {
     for each in var.postman_collections :
     substr(each.collection, length(each.collection) - 5, 5) != ".json" ? each.collection : ""
   ])
-  local_environments  = compact([
+  local_environments = compact([
     for each in var.postman_collections :
     substr(each.environment, length(each.environment) - 5, 5) == ".json" ? each.environment : ""
   ])
-  external_environments  = compact([
+  external_environments = compact([
     for each in var.postman_collections :
     substr(each.environment, length(each.environment) - 5, 5) != ".json" ? each.environment : ""
   ])

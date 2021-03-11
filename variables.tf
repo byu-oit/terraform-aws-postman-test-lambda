@@ -5,7 +5,7 @@ variable "app_name" {
 
 variable "postman_collections" {
   type = list(object({
-    collection = string
+    collection  = string
     environment = string
   }))
   description = "A list of postman collections (and environments) to run during the execution of the lambda function (in order). Collections and environments from the Postman API must be the collection/environment id"
