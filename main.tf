@@ -175,6 +175,12 @@ resource "aws_lambda_function" "test_lambda" {
   depends_on = [
     aws_cloudwatch_log_group.lambda_logs,
   ]
+
+  vpc_config {
+    subnet_ids         = var.lambda_vpc_subnet_ids
+    security_group_ids = var.lambda_vpc_security_group_ids
+    vpc_id             = var.lambda_vpc_id
+  }
 }
 
 resource "aws_iam_role" "test_lambda" {
