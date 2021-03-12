@@ -178,8 +178,7 @@ resource "aws_lambda_function" "test_lambda" {
 
   vpc_config {
     subnet_ids         = var.lambda_vpc_subnet_ids
-    security_group_ids = var.lambda_vpc_security_group_ids
-    vpc_id             = var.lambda_vpc_id
+    security_group_ids = var.lambda_vpc_subnet_ids != [] ? [aws_security_group.lambda_vpc_sg[0].id] : []
   }
 }
 
@@ -230,6 +229,47 @@ resource "aws_iam_role_policy" "test_lambda" {
   ]
 }
 EOF
+}
+
+# Role that allows lambda to create vpc config
+resource "aws_iam_role_policy" "lambda_vpc_policy" {
+  count = var.lambda_vpc_subnet_ids != [] ? 1 : 0
+
+  name = "${var.app_name}-postman-tests-vpc-policy"
+  role = aws_iam_role.test_lambda.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+  EOF
+}
+
+# A bare minimum security group for doing vpc config.
+resource "aws_security_group" "lambda_vpc_sg" {
+  count = var.lambda_vpc_subnet_ids != [] ? 1 : 0
+
+  name = "${var.app_name}-postman-tests"
+  description = "Bare minimum security group for lambda."
+  vpc_id = var.lambda_vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {

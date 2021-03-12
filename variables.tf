@@ -68,12 +68,6 @@ variable "timeout" {
   default     = 30
 }
 
-variable "lambda_vpc_security_group_ids" {
-  type        = list(string)
-  description = "Security group ids for the lambda's VPC."
-  default     = []
-}
-
 variable "lambda_vpc_subnet_ids" {
   type        = list(string)
   description = "Subnet ids that the lambda should be in."
