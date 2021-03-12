@@ -177,8 +177,8 @@ resource "aws_lambda_function" "test_lambda" {
   ]
 
   vpc_config {
-    subnet_ids         = var.lambda_vpc_subnet_ids
-    security_group_ids = var.lambda_vpc_subnet_ids != [] ? [aws_security_group.lambda_vpc_sg[0].id] : []
+    subnet_ids         = var.vpc_subnet_ids
+    security_group_ids = var.vpc_subnet_ids != [] ? [aws_security_group.lambda_vpc_sg[0].id] : []
   }
 }
 
@@ -233,7 +233,7 @@ EOF
 
 # Role that allows lambda to create vpc config
 resource "aws_iam_role_policy" "lambda_vpc_policy" {
-  count = var.lambda_vpc_subnet_ids != [] ? 1 : 0
+  count = var.vpc_subnet_ids != [] ? 1 : 0
 
   name = "${var.app_name}-postman-tests-vpc-policy"
   role = aws_iam_role.test_lambda.name
@@ -258,11 +258,11 @@ resource "aws_iam_role_policy" "lambda_vpc_policy" {
 
 # A bare minimum security group for doing vpc config.
 resource "aws_security_group" "lambda_vpc_sg" {
-  count = var.lambda_vpc_subnet_ids != [] ? 1 : 0
+  count = var.vpc_subnet_ids != [] ? 1 : 0
 
   name = "${var.app_name}-postman-tests"
   description = "Bare minimum security group for lambda."
-  vpc_id = var.lambda_vpc_id
+  vpc_id = var.vpc_id
 
   egress {
     from_port   = 0
