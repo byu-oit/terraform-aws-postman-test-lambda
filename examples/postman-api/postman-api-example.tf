@@ -15,8 +15,8 @@ module "postman_test_lambda" {
   source   = "../../"
   app_name = "postman-api-example"
   postman_collections = [{
-    collection  = "10321111-fc485922-7348-4c84-afcf-68a72362d12e"
-    environment = "10321111-18fc41dc-086c-4bc6-bf54-9d4c5f40608a"
+    collection  = "1117094-d4bd5a5f-c37c-4fe9-8723-3c3e8b1e2015" # terraform-aws-postman-test-lambda-example collection from postman TF Modules and HW Examples workspace
+    environment = "1117094-95627910-aeb0-4aed-b959-7e2034e2f6ce" # terraform-aws-postman-test-lambda-env environment from postman TF Modules and HW Examples workspace
   }]
   postman_api_key               = var.postman_api_key
   role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
