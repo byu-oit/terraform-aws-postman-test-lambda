@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [master]
 env:
-  tf_version: "0.12.26" # must match value in examples/ci/postman-api-example.tf
+  tf_version: "0.12.26" # must match value in examples/ci/advanced-example.tf
   TF_IN_AUTOMATION: true
 
 jobs:
