@@ -30,10 +30,10 @@ module "postman_test_lambda" {
 You can specify multiple collections and environments to run in the lambda function. The function will run the
 collections in order.
 
-You can run collections/environments from local json files or using the postman API.
+You can run collections/environments from local json files or using the [Postman API](#using-the-postman-api).
 
-**Note:** When using the postman API: the postman collections/environments must be viewable by the postman account tied
-to the API key you provide.
+**Note:** When [using the Postman API](#using-the-postman-api): the postman collections/environments must be viewable by
+the postman account tied to the API key you provide.
 
 **DON'T** hard code your postman API key, treat it like all other secrets.
 
@@ -85,6 +85,21 @@ You can [generate an API key](https://learning.postman.com/docs/developer/intro-
 
 Provide the collection and environment IDs instead of the name of each. You can find the ID on the v8 Postman Client by
 selecting your collection/environment and clicking on the info icon.
+
+```hcl
+module "postman_test_lambda" {
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.0.0"
+  app_name = "from-postman-api-example"
+  postman_collections = [
+    {
+      collection  = "1117094-d4bd5a5f-c37c-4fe9-8723-3c3e8b1e2015" # terraform-aws-postman-test-lambda-example collection from postman TF Modules and HW Examples workspace
+      environment = "1117094-95627910-aeb0-4aed-b959-7e2034e2f6ce" # terraform-aws-postman-test-lambda-env environment from postman TF Modules and HW Examples workspace
+    }
+  ]
+  postman_api_key               = var.postman_api_key
+  role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
+}
+```
 
 ## Requirements
 
