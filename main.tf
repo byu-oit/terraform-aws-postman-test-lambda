@@ -17,7 +17,7 @@ locals {
     POSTMAN_API_KEY          = var.postman_api_key
   }
   lambda_function_name = "${var.app_name}-postman-tests"
-  using_vpc_config     = var.vpc_subnet_ids != []
+  using_vpc_config     = length(var.vpc_subnet_ids) > 0
 }
 
 # -----------------------------------------------------------------------------
