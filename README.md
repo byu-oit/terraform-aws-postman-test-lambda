@@ -14,7 +14,7 @@ You can provide a postman collection and environment to be tested in one of two 
 1. Provided in your github repo
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.4.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.5.0"
         app_name                      = "simple-example"
         postman_collection_file       = "terraform-aws-postman-test-lambda-example.postman_collection.json"
         postman_environment_file      = "terraform-aws-postman-test-lambda-env.postman_environment.json"
