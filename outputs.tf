@@ -15,5 +15,5 @@ output "cloudwatch_log_group" {
 }
 
 output "lambda_security_group" {
-  value = aws_security_group.lambda_vpc_sg
+  value = local.using_vpc_config ? aws_security_group.lambda_vpc_sg[0] : null
 }
