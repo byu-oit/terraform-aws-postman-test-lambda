@@ -16,11 +16,11 @@ locals {
   ])
   local_environments = compact([
     for each in var.postman_collections :
-    substr(each.environment, length(each.environment) - 5, 5) == ".json" ? each.environment : ""
+    each.environment != null ? substr(each.environment, length(each.environment) - 5, 5) == ".json" ? each.environment : "" : ""
   ])
   external_environments = compact([
     for each in var.postman_collections :
-    substr(each.environment, length(each.environment) - 5, 5) != ".json" ? each.environment : ""
+    each.environment != null ? substr(each.environment, length(each.environment) - 5, 5) != ".json" ? each.environment : "" : ""
   ])
   using_local_files = length(local.local_collections) + length(local.local_environments) > 0
   lambda_env_variables = {

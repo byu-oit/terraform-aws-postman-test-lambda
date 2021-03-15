@@ -32,7 +32,7 @@ exports.handler = async function (event, context) {
         promises.push(downloadFileFromPostman('collection', each.collection))
         each.collection = `${tmpDir}${sep}${each.collection}.json`
       }
-      if (each.environment){ // environment can be null
+      if (each.environment) { // environment can be null
         if (each.environment.includes('.json')) {
           promises.push(downloadFileFromBucket(each.environment))
           each.environment = `${tmpDir}${sep}${each.environment}`
