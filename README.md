@@ -123,7 +123,7 @@ module "postman_test_lambda" {
 ### postman_collection
 Object defining the collection and environment to run.
 * **`collection`** - (Required) path to local collection json file or Postman collection ID
-* **`environment`** - (Required) path to local environment json file or Postman environment ID
+* **`environment`** - (Optional) path to local environment json file or Postman environment ID (can be set to `null` if you don't want an environment on your postman collection)
 
 ## Outputs
 
