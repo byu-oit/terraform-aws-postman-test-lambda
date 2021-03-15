@@ -24,7 +24,7 @@ jobs:
                 "tf_plan_extra_args":""
               },
               {
-                "tf_working_dir":"./examples/postman-api",
+                "tf_working_dir":"./examples/advanced",
                 "aws_key_name":"byu_oit_terraform_dev_key",
                 "aws_secret_name":"byu_oit_terraform_dev_secret",
                 "tf_plan_extra_args":"-var 'postman_api_key=fake_api_key'"
