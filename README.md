@@ -14,7 +14,7 @@ You can provide a postman collection and environment to be tested in one of two 
 1. Provided in your github repo
     ```hcl
     module "postman_test_lambda" {
-      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.4.0"
+      source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v2.5.0"
         app_name                      = "simple-example"
         postman_collection_file       = "terraform-aws-postman-test-lambda-example.postman_collection.json"
         postman_environment_file      = "terraform-aws-postman-test-lambda-env.postman_environment.json"
@@ -89,6 +89,8 @@ module "lambda_api" {
 | tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                 | {}      |
 | timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                | 30      |
 | memory_size                   | number      | The size of the memory of the lambda                                                                               | 128     |
+| vpc_id                        | string      | The id of the VPC the lambda will be behind if VPC configuration is desired. (must be provided with lambda_vpc_subnet_ids)          | null      |
+| vpc_subnet_ids         | list(string) | A list of subnet ids the lambda will be put in if VPC configuration is desired. (must be provided with vpc_id) | [] |
 
 ## Outputs
 | Name            | Type                                                                                              | Description                                                               |
@@ -97,6 +99,7 @@ module "lambda_api" {
 | lambda_iam_role | [object](https://www.terraform.io/docs/providers/aws/r/iam_role.html#attributes-reference)        | Created IAM role for the `lambda_function`                                |
 | postman_files_bucket | [object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference)  | Created S3 Bucket where local postman files are uploaded                  |
 | cloudwatch_log_group | [object](https://www.terraform.io/docs/providers/aws/r/cloudwatch_log_group.html#attributes-reference)  | Created CloudWatch Log Group for the postman lambda logs       |
+| lambda_security_group | [object](https://www.terraform.io/docs/providers/aws/r/security_group.html#attributes-reference) | Created security group for the lambda's VPC configuration. |
 
 ## Contributing
 To contribute to this terraform module make a feature branch and create a Pull Request to the `master` branch.

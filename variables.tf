@@ -67,3 +67,15 @@ variable "timeout" {
   description = "the amount of time the lambda is allowed to run for"
   default     = 30
 }
+
+variable "vpc_subnet_ids" {
+  type        = list(string)
+  description = "Subnet ids that the lambda should be in."
+  default     = []
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "ID for the lambda's VPC"
+  default     = null
+}
