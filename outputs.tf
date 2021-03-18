@@ -13,3 +13,7 @@ output "postman_files_bucket" {
 output "cloudwatch_log_group" {
   value = aws_cloudwatch_log_group.lambda_logs
 }
+
+output "lambda_security_group" {
+  value = local.using_vpc_config ? aws_security_group.lambda_vpc_sg[0] : null
+}

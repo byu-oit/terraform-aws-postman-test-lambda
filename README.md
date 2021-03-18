@@ -4,10 +4,9 @@
 
 Terraform module that creates a generic lambda function that runs newman tests against a postman collection.
 
-This lambda function is intended for use
-with [CodeDeploy's lifecycle hooks](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html)
-. This lambda function will attempt to run the [newman](https://www.npmjs.com/package/newman) CLI to run your Postman
-collection as a test. This lambda function will tell CodeDeploy if the tests pass or fail.
+This lambda function is intended for use with [CodeDeploy's lifecycle hooks](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html).
+This lambda function will attempt to run the [newman](https://www.npmjs.com/package/newman) CLI to run your Postman collection as a test.
+This lambda function will tell CodeDeploy if the tests pass or fail.
 
 #### [New to Terraform Modules at BYU?](https://github.com/byu-oit/terraform-documentation)
 
@@ -47,11 +46,11 @@ module "fargate_api" {
   source = "github.com/byu-oit/terraform-aws-fargate-api?ref=" # latest version
   # .. all other variables
   codedeploy_lifecycle_hooks = {
-    BeforeInstall = null
-    AfterInstall = null
+    BeforeInstall         = null
+    AfterInstall          = null
     AfterAllowTestTraffic = module.postman_test_lambda.lambda_function.function_name
-    BeforeAllowTraffic = null
-    AfterAllowTraffic = null
+    BeforeAllowTraffic    = null
+    AfterAllowTraffic     = null
   }
 }
 ```
@@ -66,7 +65,7 @@ module "lambda_api" {
   # .. all other variables
   codedeploy_lifecycle_hooks = {
     BeforeAllowTraffic = module.postman_test_lambda.lambda_function.function_name
-    AfterAllowTraffic = null
+    AfterAllowTraffic  = null
   }
 }
 ```
@@ -117,6 +116,8 @@ module "postman_test_lambda" {
 | tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                 | {}      |
 | timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                | 30      |
 | memory_size                   | number      | The size of the memory of the lambda                                                                               | 128     |
+| vpc_id                        | string      | The id of the VPC the lambda will be behind if VPC configuration is desired. (must be provided with lambda_vpc_subnet_ids)          | null      |
+| vpc_subnet_ids         | list(string) | A list of subnet ids the lambda will be put in if VPC configuration is desired. (must be provided with vpc_id) | [] |
 
 ### postman_collection
 Object defining the collection and environment to run.
@@ -131,6 +132,7 @@ Object defining the collection and environment to run.
 | lambda_iam_role | [object](https://www.terraform.io/docs/providers/aws/r/iam_role.html#attributes-reference)        | Created IAM role for the `lambda_function`                                |
 | postman_files_bucket | [object](https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#attributes-reference)  | Created S3 Bucket where local postman files are uploaded                  |
 | cloudwatch_log_group | [object](https://www.terraform.io/docs/providers/aws/r/cloudwatch_log_group.html#attributes-reference)  | Created CloudWatch Log Group for the postman lambda logs       |
+| lambda_security_group | [object](https://www.terraform.io/docs/providers/aws/r/security_group.html#attributes-reference) | Created security group for the lambda's VPC configuration. |
 
 ## Contributing
 
