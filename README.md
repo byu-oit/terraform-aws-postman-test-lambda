@@ -44,8 +44,7 @@ if you're using the [fargate-api module](https://github.com/byu-oit/terraform-aw
 # ... postman-test-lambda module
 
 module "fargate_api" {
-  source = "github.com/byu-oit/terraform-aws-fargate-api?ref="
-  # latest version
+  source = "github.com/byu-oit/terraform-aws-fargate-api?ref=" # latest version
   # .. all other variables
   codedeploy_lifecycle_hooks = {
     BeforeInstall = null
@@ -63,8 +62,7 @@ Or if you're using the [lambda-api module](https://github.com/byu-oit/terraform-
 # ... postman-test-lambda module
 
 module "lambda_api" {
-  source = "github.com/byu-oit/terraform-aws-lambda-api?ref="
-  # latest version
+  source = "github.com/byu-oit/terraform-aws-lambda-api?ref=" # latest version
   # .. all other variables
   codedeploy_lifecycle_hooks = {
     BeforeAllowTraffic = module.postman_test_lambda.lambda_function.function_name
