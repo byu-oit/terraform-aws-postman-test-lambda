@@ -23,7 +23,7 @@ exports.handler = async function (event, context) {
     error = new Error('Env variable POSTMAN_COLLECTIONS is required')
   } else {
     const postmanList = JSON.parse(postmanCollections)
-    const promises = []
+    const promises = [timer]
     for (const each of postmanList) {
       if (each.collection.includes('.json')) {
         promises.push(downloadFileFromBucket(each.collection))
@@ -42,10 +42,9 @@ exports.handler = async function (event, context) {
         }
       }
     }
+    // finish the 10 second timer before trying to run the postman tests as well as finish downloading any files
     await Promise.all(promises)
 
-    // finish the 10 second timer before trying to run the postman tests
-    await timer
     if (!error) {
       // no need to run tests if files weren't downloaded correctly
       for (const each of postmanList) {

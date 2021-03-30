@@ -3,12 +3,21 @@ provider "aws" {
   region  = "us-west-2"
 }
 
+variable "postman_api_key" {
+  type = string
+}
+
 data aws_ssm_parameter role_permissions_boundary_arn {
   name = "/acs/iam/iamRolePermissionBoundary"
 }
-
-variable "postman_api_key" {
-  type = string
+data "aws_ssm_parameter" "vpc_name" {
+  name = "/acs/vpc/vpc-name"
+}
+data "aws_ssm_parameter" "vpc_id" {
+  name = "/acs/vpc/${data.aws_ssm_parameter.vpc_name.value}"
+}
+data "aws_ssm_parameter" "subnet_id" {
+  name = "/acs/vpc/${data.aws_ssm_parameter.vpc_name.value}-private-a"
 }
 
 module "postman_test_lambda" {
@@ -26,4 +35,8 @@ module "postman_test_lambda" {
   ]
   postman_api_key               = var.postman_api_key
   role_permissions_boundary_arn = data.aws_ssm_parameter.role_permissions_boundary_arn.value
+  vpc_id                        = data.aws_ssm_parameter.vpc_id.value
+  vpc_subnet_ids                = [data.aws_ssm_parameter.subnet_id.value]
+  memory_size                   = 528
+  timeout                       = 120
 }

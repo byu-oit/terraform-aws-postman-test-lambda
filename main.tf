@@ -176,7 +176,7 @@ resource "aws_lambda_function" "test_lambda" {
   function_name    = local.lambda_function_name
   role             = aws_iam_role.test_lambda.arn
   handler          = "index.handler"
-  runtime          = "nodejs12.x"
+  runtime          = "nodejs14.x"
   timeout          = var.timeout
   memory_size      = var.memory_size
   source_code_hash = base64sha256("${path.module}/lambda/dist/function.zip")
