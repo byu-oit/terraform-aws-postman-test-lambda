@@ -6,15 +6,27 @@ terraform {
 }
 
 locals {
-  using_local_files = var.postman_api_key == null
-  lambda_env_variables = local.using_local_files ? {
-    S3_BUCKET           = aws_s3_bucket.postman_bucket[0].bucket
-    POSTMAN_COLLECTION  = aws_s3_bucket_object.collection[0].key
-    POSTMAN_ENVIRONMENT = aws_s3_bucket_object.environment[0].key
-    } : {
-    POSTMAN_COLLECTION_NAME  = var.postman_collection_name
-    POSTMAN_ENVIRONMENT_NAME = var.postman_environment_name
-    POSTMAN_API_KEY          = var.postman_api_key
+  local_collections = compact([
+    for each in var.postman_collections :
+    substr(each.collection, length(each.collection) - 5, 5) == ".json" ? each.collection : ""
+  ])
+  external_collections = compact([
+    for each in var.postman_collections :
+    substr(each.collection, length(each.collection) - 5, 5) != ".json" ? each.collection : ""
+  ])
+  local_environments = compact([
+    for each in var.postman_collections :
+    each.environment != null ? substr(each.environment, length(each.environment) - 5, 5) == ".json" ? each.environment : "" : ""
+  ])
+  external_environments = compact([
+    for each in var.postman_collections :
+    each.environment != null ? substr(each.environment, length(each.environment) - 5, 5) != ".json" ? each.environment : "" : ""
+  ])
+  using_local_files = length(local.local_collections) + length(local.local_environments) > 0
+  lambda_env_variables = {
+    S3_BUCKET           = local.using_local_files ? aws_s3_bucket.postman_bucket[0].bucket : null
+    POSTMAN_COLLECTIONS = jsonencode(var.postman_collections)
+    POSTMAN_API_KEY     = var.postman_api_key
   }
   lambda_function_name = "${var.app_name}-postman-tests"
   using_vpc_config     = length(var.vpc_subnet_ids) > 0
@@ -92,23 +104,23 @@ resource "aws_s3_bucket_public_access_block" "default" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_object" "collection" {
-  count = local.using_local_files ? 1 : 0
+resource "aws_s3_bucket_object" "collections" {
+  count = length(local.local_collections)
 
   bucket = aws_s3_bucket.postman_bucket[0].bucket
-  key    = basename(var.postman_collection_file)
-  source = var.postman_collection_file
-  etag   = filemd5(var.postman_collection_file)
+  key    = basename(local.local_collections[count.index])
+  source = local.local_collections[count.index]
+  etag   = filemd5(local.local_collections[count.index])
   tags   = var.tags
 }
 
-resource "aws_s3_bucket_object" "environment" {
-  count = local.using_local_files ? 1 : 0
+resource "aws_s3_bucket_object" "environments" {
+  count = length(local.local_environments)
 
   bucket = aws_s3_bucket.postman_bucket[0].bucket
-  key    = basename(var.postman_environment_file)
-  source = var.postman_environment_file
-  etag   = filemd5(var.postman_environment_file)
+  key    = basename(local.local_environments[count.index])
+  source = local.local_environments[count.index]
+  etag   = filemd5(local.local_environments[count.index])
   tags   = var.tags
 }
 
@@ -164,7 +176,7 @@ resource "aws_lambda_function" "test_lambda" {
   function_name    = local.lambda_function_name
   role             = aws_iam_role.test_lambda.arn
   handler          = "index.handler"
-  runtime          = "nodejs12.x"
+  runtime          = "nodejs14.x"
   timeout          = var.timeout
   memory_size      = var.memory_size
   source_code_hash = base64sha256("${path.module}/lambda/dist/function.zip")

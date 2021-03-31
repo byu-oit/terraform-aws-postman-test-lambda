@@ -17,28 +17,45 @@ exports.handler = async function (event, context) {
 
   // store the error so that we can update codedeploy lifecycle if there are any errors including errors from downloading files
   let error
-  if (process.env.POSTMAN_API_KEY) {
-    // download postman files from Postman API
-    await Promise.all([
-      downloadFileFromPostman('collection', process.env.POSTMAN_COLLECTION_NAME),
-      downloadFileFromPostman('environment', process.env.POSTMAN_ENVIRONMENT_NAME)
-    ]).catch(err => { error = err })
-  } else {
-    // download postman files from S3 Bucket
-    await Promise.all([
-      downloadFileFromBucket('collection', process.env.POSTMAN_COLLECTION),
-      downloadFileFromBucket('environment', process.env.POSTMAN_ENVIRONMENT)
-    ]).catch(err => { error = err })
-  }
 
-  // finish the 10 second timer before trying to run the postman tests
-  await timer
-  if (!error) {
-    // no need to run tests if files weren't downloaded correctly
-    await runTests(
-      `${tmpDir}${sep}collection.json`,
-      `${tmpDir}${sep}environment.json`
-    ).catch(err => { error = err })
+  const postmanCollections = process.env.POSTMAN_COLLECTIONS
+  if (!postmanCollections) {
+    error = new Error('Env variable POSTMAN_COLLECTIONS is required')
+  } else {
+    const postmanList = JSON.parse(postmanCollections)
+    const promises = [timer]
+    for (const each of postmanList) {
+      if (each.collection.includes('.json')) {
+        promises.push(downloadFileFromBucket(each.collection))
+        each.collection = `${tmpDir}${sep}${each.collection}`
+      } else {
+        promises.push(downloadFileFromPostman('collection', each.collection))
+        each.collection = `${tmpDir}${sep}${each.collection}.json`
+      }
+      if (each.environment) { // environment can be null
+        if (each.environment.includes('.json')) {
+          promises.push(downloadFileFromBucket(each.environment))
+          each.environment = `${tmpDir}${sep}${each.environment}`
+        } else {
+          promises.push(downloadFileFromPostman('environment', each.environment))
+          each.environment = `${tmpDir}${sep}${each.environment}.json`
+        }
+      }
+    }
+    // finish the 10 second timer before trying to run the postman tests as well as finish downloading any files
+    await Promise.all(promises)
+
+    if (!error) {
+      // no need to run tests if files weren't downloaded correctly
+      for (const each of postmanList) {
+        if (!error) {
+          // don't run later collections if previous one errored out
+          await runTest(each.collection, each.environment).catch(err => {
+            error = err
+          })
+        }
+      }
+    }
   }
 
   const deploymentId = event.DeploymentId
@@ -68,39 +85,29 @@ exports.handler = async function (event, context) {
   if (error) throw error // Cause the lambda to "fail"
 }
 
-async function downloadFileFromPostman (type, name) {
-  const filename = `${tmpDir}${sep}${type}.json`
+async function downloadFileFromPostman (type, id) {
+  const filename = `${tmpDir}${sep}${id}.json`
   console.log(`started download for ${filename}`)
-  const response = await fetch(`https://api.getpostman.com/${type}s`, {
+  const response = await fetch(`https://api.getpostman.com/${type}s/${id}`, {
     method: 'GET',
     headers: {
       'X-Api-Key': process.env.POSTMAN_API_KEY
     }
+  }).catch(err => {
+    throw new Error(`Error trying to download ${type} ${id} from Postman API: ${err}`)
   })
-  const json = await response.json()
-  const list = json[`${type}s`]
-  const found = list.filter(entry => entry.name === name)
-  if (found.length > 1) {
-    throw Error(`More than 1 ${type} files found with name '${name}'. Please make your ${type}'s name is unique.`)
-  } else if (found.length === 0) {
-    throw Error(`No ${type} found with name '${name}'.`)
-  } else {
-    const uid = found[0].uid
-    console.log(`Found uid (${uid}) for ${type} with name = ${name}`)
-    const actualResponse = await fetch(`https://api.getpostman.com/${type}s/${uid}`, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': process.env.POSTMAN_API_KEY
-      }
-    })
-    await fs.writeFile(filename, await actualResponse.text())
-    console.log(`downloaded ${filename}`)
+  const data = await response.text()
+  if (response.status !== 200) {
+    const errorData = JSON.parse(data)
+    throw new Error(`Error trying to download ${type} ${id} from Postman API: ${errorData.error.message}`)
   }
+  await fs.writeFile(filename, data)
+  console.log(`downloaded ${filename}`)
 }
 
-async function downloadFileFromBucket (type, key) {
-  const filename = `${tmpDir}${sep}${type}.json`
-  console.log(`started download for ${type} with key ${key} from s3 bucket`)
+async function downloadFileFromBucket (key) {
+  const filename = `${tmpDir}${sep}${key}`
+  console.log(`started download for ${key} from s3 bucket`)
 
   let data
   try {
@@ -115,6 +122,7 @@ async function downloadFileFromBucket (type, key) {
 
   await fs.writeFile(filename, data.Body.toString())
   console.log(`downloaded ${filename}`)
+  return filename
 }
 
 function newmanRun (options) {
@@ -123,9 +131,9 @@ function newmanRun (options) {
   })
 }
 
-async function runTests (postmanCollection, postmanEnvironment) {
+async function runTest (postmanCollection, postmanEnvironment) {
   try {
-    console.log('running postman tests')
+    console.log(`running postman test for ${postmanCollection}`)
     await newmanRun({
       collection: postmanCollection,
       environment: postmanEnvironment,
