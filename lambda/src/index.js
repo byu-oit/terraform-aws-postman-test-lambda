@@ -10,7 +10,17 @@ const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
 const tmpDir = process.env.TMP_DIR || os.tmpdir()
 
 exports.handler = async function (event, context) {
-  console.log(event)
+  console.log('event', event)
+  const deploymentId = event.DeploymentId
+  const combinedRunner = event.Combined
+  if (deploymentId) {
+    console.log(`After postman tests are complete, this will update the CodeDeploy deployment ${deploymentId}.`)
+  } else if (combinedRunner) {
+    console.log(`After postman tests are complete, this will return a pass/fail to the combined runner: ${combinedRunner}`)
+  } else {
+    console.log('No DeploymentId found in event, this will execute the postman tests and then exit.')
+  }
+
   // Workaround for CodeDeploy bug.
   // Give the ALB 10 seconds to make sure the test TG has switched to the new code.
   const timer = sleep(10000)
@@ -42,9 +52,10 @@ exports.handler = async function (event, context) {
         }
       }
     }
-    // finish the 10 second timer before trying to run the postman tests as well as finish downloading any files
+    // make sure all files are downloaded and we wait for 10 seconds before executing postman tests
     await Promise.all(promises)
 
+    console.log('starting postman tests ...')
     if (!error) {
       // no need to run tests if files weren't downloaded correctly
       for (const each of postmanList) {
@@ -56,10 +67,9 @@ exports.handler = async function (event, context) {
         }
       }
     }
+    console.log('postman tests finished')
   }
 
-  const deploymentId = event.DeploymentId
-  const combinedRunner = event.Combined
   if (deploymentId) {
     console.log('starting to update CodeDeploy lifecycle event hook status...')
     const params = {
@@ -149,7 +159,10 @@ async function runTest (postmanCollection, postmanEnvironment) {
 
 function sleep (ms) {
   console.log('started sleep timer')
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(args => {
+    console.log('ended sleep timer')
+    resolve()
+  }, ms))
 }
 
 // exports.handler({}, {})

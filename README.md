@@ -14,7 +14,7 @@ This lambda function will tell CodeDeploy if the tests pass or fail.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.0.0"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.0.1"
   app_name = "simple-example"
   postman_collections = [
     {
@@ -85,7 +85,7 @@ selecting your collection/environment and clicking on the info icon.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.0.0"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.0.1"
   app_name = "from-postman-api-example"
   postman_collections = [
     {
