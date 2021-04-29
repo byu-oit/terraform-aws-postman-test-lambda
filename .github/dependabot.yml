@@ -1,0 +1,15 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/lambda"
+  schedule:
+    interval: weekly
+    time: "08:00"
+    timezone: America/Denver
+  open-pull-requests-limit: 10
+  reviewers:
+  - yoshutch
+  ignore:
+  - dependency-name: aws-sdk
+    versions:
+    - 2.x
