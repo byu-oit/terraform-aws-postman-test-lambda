@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.721.0",
-    "newman": "^5.2.2",
+    "newman": "^5.2.3",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
