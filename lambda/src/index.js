@@ -4,6 +4,7 @@ const os = require('os')
 const { sep } = require('path')
 const newman = require('newman')
 const AWS = require('aws-sdk')
+const path = require('path')
 const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
 const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
 
@@ -28,70 +29,53 @@ exports.handler = async function (event, context) {
   // store the error so that we can update codedeploy lifecycle if there are any errors including errors from downloading files
   let error
 
-  const postmanCollections = process.env.POSTMAN_COLLECTIONS
-  if (!postmanCollections) {
-    error = new Error('Env variable POSTMAN_COLLECTIONS is required')
-  } else {
-    const postmanList = JSON.parse(postmanCollections)
-    const promises = [timer]
-    for (const each of postmanList) {
-      if (each.collection.includes('.json')) {
-        promises.push(downloadFileFromBucket(each.collection))
-        each.collection = `${tmpDir}${sep}${each.collection}`
-      } else {
-        promises.push(downloadFileFromPostman('collection', each.collection))
-        each.collection = `${tmpDir}${sep}${each.collection}.json`
-      }
-      if (each.environment) { // environment can be null
-        if (each.environment.includes('.json')) {
-          promises.push(downloadFileFromBucket(each.environment))
-          each.environment = `${tmpDir}${sep}${each.environment}`
-        } else {
-          promises.push(downloadFileFromPostman('environment', each.environment))
-          each.environment = `${tmpDir}${sep}${each.environment}.json`
-        }
-      }
-    }
-    // make sure all files are downloaded and we wait for 10 seconds before executing postman tests
-    await Promise.all(promises)
-
-    console.log('starting postman tests ...')
-    if (!error) {
-      // no need to run tests if files weren't downloaded correctly
+  try {
+    const postmanCollections = process.env.POSTMAN_COLLECTIONS
+    if (!postmanCollections) {
+      error = new Error('Env variable POSTMAN_COLLECTIONS is required')
+    } else {
+      const postmanList = JSON.parse(postmanCollections)
+      const promises = [timer]
       for (const each of postmanList) {
-        if (!error) {
-          // don't run later collections if previous one errored out
-          await runTest(each.collection, each.environment).catch(err => {
-            error = err
-          })
+        if (each.collection.includes('.json')) {
+          promises.push(downloadFileFromBucket(each.collection))
+          each.collection = `${tmpDir}${sep}${path.basename(each.collection)}`
+        } else {
+          promises.push(downloadFileFromPostman('collection', each.collection))
+          each.collection = `${tmpDir}${sep}${path.basename(each.collection)}.json`
+        }
+        if (each.environment) { // environment can be null
+          if (each.environment.includes('.json')) {
+            promises.push(downloadFileFromBucket(each.environment))
+            each.environment = `${tmpDir}${sep}${path.basename(each.environment)}`
+          } else {
+            promises.push(downloadFileFromPostman('environment', each.environment))
+            each.environment = `${tmpDir}${sep}${path.basename(each.environment)}.json`
+          }
         }
       }
-    }
-    console.log('postman tests finished')
-  }
+      // make sure all files are downloaded and we wait for 10 seconds before executing postman tests
+      await Promise.all(promises)
 
-  if (deploymentId) {
-    console.log('starting to update CodeDeploy lifecycle event hook status...')
-    const params = {
-      deploymentId: event.DeploymentId,
-      lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
-      status: error ? 'Failed' : 'Succeeded'
+      console.log('starting postman tests ...')
+      if (!error) {
+        // no need to run tests if files weren't downloaded correctly
+        for (const each of postmanList) {
+          if (!error) {
+            // don't run later collections if previous one errored out
+            await runTest(each.collection, each.environment).catch(err => {
+              error = err
+            })
+          }
+        }
+      }
+      console.log('postman tests finished')
     }
-    try {
-      const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
-      console.log(data)
-    } catch (err) {
-      console.log(err, err.stack)
-      throw err
-    }
-  } else if (combinedRunner) {
-    return {
-      passed: !error
-    }
-  } else {
-    console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
+    await updateRunner(deploymentId, combinedRunner, event, error)
+  } catch (e) {
+    await updateRunner(deploymentId, combinedRunner, event, true)
+    throw e
   }
-
   if (error) throw error // Cause the lambda to "fail"
 }
 
@@ -116,6 +100,9 @@ async function downloadFileFromPostman (type, id) {
 }
 
 async function downloadFileFromBucket (key) {
+  // Stripping relative path off of key.
+  key = path.basename(key)
+
   const filename = `${tmpDir}${sep}${key}`
   console.log(`started download for ${key} from s3 bucket`)
 
@@ -137,7 +124,9 @@ async function downloadFileFromBucket (key) {
 
 function newmanRun (options) {
   return new Promise((resolve, reject) => {
-    newman.run(options, err => { err ? reject(err) : resolve() })
+    newman.run(options, err => {
+      err ? reject(err) : resolve()
+    })
   })
 }
 
@@ -157,6 +146,30 @@ async function runTest (postmanCollection, postmanEnvironment) {
   }
 }
 
+async function updateRunner (deploymentId, combinedRunner, event, error) {
+  if (deploymentId) {
+    console.log('starting to update CodeDeploy lifecycle event hook status...')
+    const params = {
+      deploymentId: deploymentId,
+      lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
+      status: error ? 'Failed' : 'Succeeded'
+    }
+    try {
+      const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
+      console.log(data)
+    } catch (err) {
+      console.log(err, err.stack)
+      throw err
+    }
+  } else if (combinedRunner) {
+    return {
+      passed: !error
+    }
+  } else {
+    console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
+  }
+}
+
 function sleep (ms) {
   console.log('started sleep timer')
   return new Promise(resolve => setTimeout(args => {
@@ -165,4 +178,4 @@ function sleep (ms) {
   }, ms))
 }
 
-// exports.handler({}, {})
+// exports.handler({}, {}).then(() => {})
