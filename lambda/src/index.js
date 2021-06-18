@@ -39,18 +39,18 @@ exports.handler = async function (event, context) {
       for (const each of postmanList) {
         if (each.collection.includes('.json')) {
           promises.push(downloadFileFromBucket(each.collection))
-          each.collection = `${tmpDir}${sep}${each.collection}`
+          each.collection = `${tmpDir}${sep}${path.basename(each.collection)}`
         } else {
           promises.push(downloadFileFromPostman('collection', each.collection))
-          each.collection = `${tmpDir}${sep}${each.collection}.json`
+          each.collection = `${tmpDir}${sep}${path.basename(each.collection)}.json`
         }
         if (each.environment) { // environment can be null
           if (each.environment.includes('.json')) {
             promises.push(downloadFileFromBucket(each.environment))
-            each.environment = `${tmpDir}${sep}${each.environment}`
+            each.environment = `${tmpDir}${sep}${path.basename(each.environment)}`
           } else {
             promises.push(downloadFileFromPostman('environment', each.environment))
-            each.environment = `${tmpDir}${sep}${each.environment}.json`
+            each.environment = `${tmpDir}${sep}${path.basename(each.environment)}.json`
           }
         }
       }
@@ -72,12 +72,11 @@ exports.handler = async function (event, context) {
       console.log('postman tests finished')
     }
     await updateRunner(deploymentId, combinedRunner, event, error)
-
-    if (error) throw error // Cause the lambda to "fail"
   } catch (e) {
     await updateRunner(deploymentId, combinedRunner, event, true)
-    throw error
+    throw e
   }
+  if (error) throw error // Cause the lambda to "fail"
 }
 
 async function downloadFileFromPostman (type, id) {
@@ -179,4 +178,4 @@ function sleep (ms) {
   }, ms))
 }
 
-// exports.handler({}, {})
+// exports.handler({}, {}).then(() => {})
