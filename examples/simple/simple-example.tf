@@ -3,7 +3,7 @@ provider "aws" {
   region  = "us-west-2"
 }
 
-data aws_ssm_parameter role_permissions_boundary_arn {
+data "aws_ssm_parameter" "role_permissions_boundary_arn" {
   name = "/acs/iam/iamRolePermissionBoundary"
 }
 

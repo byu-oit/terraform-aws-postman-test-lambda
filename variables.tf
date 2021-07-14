@@ -63,3 +63,9 @@ variable "vpc_id" {
   description = "ID for the lambda's VPC"
   default     = null
 }
+
+variable "test_env_var_overrides" {
+  type        = map(string)
+  description = "Values to set or override in the Postman test environment."
+  default     = {}
+}

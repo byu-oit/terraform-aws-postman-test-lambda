@@ -7,7 +7,7 @@ variable "postman_api_key" {
   type = string
 }
 
-data aws_ssm_parameter role_permissions_boundary_arn {
+data "aws_ssm_parameter" "role_permissions_boundary_arn" {
   name = "/acs/iam/iamRolePermissionBoundary"
 }
 data "aws_ssm_parameter" "vpc_name" {
