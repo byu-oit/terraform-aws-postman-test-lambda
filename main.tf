@@ -54,7 +54,7 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
     abort_incomplete_multipart_upload_days = 10
 
     expiration {
-      days                         = 0
+      days                         = 120
       expired_object_delete_marker = false
     }
   }
