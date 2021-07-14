@@ -1,6 +1,6 @@
 {
   "name": "postman-test-lambda",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Lambda function that runs postman collection tests",
   "repository": {
     "type": "git",
