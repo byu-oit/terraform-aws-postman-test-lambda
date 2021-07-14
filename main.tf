@@ -24,9 +24,10 @@ locals {
   ])
   using_local_files = length(local.local_collections) + length(local.local_environments) > 0
   lambda_env_variables = {
-    S3_BUCKET           = local.using_local_files ? aws_s3_bucket.postman_bucket[0].bucket : null
-    POSTMAN_COLLECTIONS = jsonencode(var.postman_collections)
-    POSTMAN_API_KEY     = var.postman_api_key
+    S3_BUCKET              = local.using_local_files ? aws_s3_bucket.postman_bucket[0].bucket : null
+    POSTMAN_COLLECTIONS    = jsonencode(var.postman_collections)
+    POSTMAN_API_KEY        = var.postman_api_key
+    TEST_ENV_VAR_OVERRIDES = jsonencode(var.test_env_var_overrides)
   }
   lambda_function_name = "${var.app_name}-postman-tests"
   using_vpc_config     = length(var.vpc_subnet_ids) > 0
@@ -53,7 +54,7 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
     abort_incomplete_multipart_upload_days = 10
 
     expiration {
-      days                         = 0
+      days                         = 120
       expired_object_delete_marker = false
     }
   }

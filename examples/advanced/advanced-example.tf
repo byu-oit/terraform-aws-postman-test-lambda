@@ -7,7 +7,7 @@ variable "postman_api_key" {
   type = string
 }
 
-data aws_ssm_parameter role_permissions_boundary_arn {
+data "aws_ssm_parameter" "role_permissions_boundary_arn" {
   name = "/acs/iam/iamRolePermissionBoundary"
 }
 data "aws_ssm_parameter" "vpc_name" {
@@ -39,4 +39,7 @@ module "postman_test_lambda" {
   vpc_subnet_ids                = [data.aws_ssm_parameter.subnet_id.value]
   memory_size                   = 528
   timeout                       = 120
+  test_env_var_overrides = {
+    foo = "boo"
+  }
 }

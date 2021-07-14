@@ -137,7 +137,8 @@ async function runTest (postmanCollection, postmanEnvironment) {
       collection: postmanCollection,
       environment: postmanEnvironment,
       reporters: 'cli',
-      abortOnFailure: true
+      abortOnFailure: true,
+      envVar: generateEnvVars()
     })
     console.log('collection run complete!')
   } catch (err) {
@@ -168,6 +169,16 @@ async function updateRunner (deploymentId, combinedRunner, event, error) {
   } else {
     console.log('No deployment ID found in the event. Skipping update to CodeDeploy lifecycle hook...')
   }
+}
+
+function generateEnvVars () {
+  const envVarsArray = []
+  const parsedVars = JSON.parse(process.env.TEST_ENV_VAR_OVERRIDES, 'base64')
+  if (Object.keys(parsedVars).length === 0) return envVarsArray
+  for (const [key, value] of Object.entries(parsedVars)) {
+    envVarsArray.push({ key, value })
+  }
+  return envVarsArray
 }
 
 function sleep (ms) {
