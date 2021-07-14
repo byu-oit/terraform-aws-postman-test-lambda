@@ -118,6 +118,7 @@ module "postman_test_lambda" {
 | memory_size                   | number      | The size of the memory of the lambda                                                                               | 128     |
 | vpc_id                        | string      | The id of the VPC the lambda will be behind if VPC configuration is desired. (must be provided with lambda_vpc_subnet_ids)          | null      |
 | vpc_subnet_ids         | list(string) | A list of subnet ids the lambda will be put in if VPC configuration is desired. (must be provided with vpc_id) | [] |
+| test_env_var_overrides | map(string) | Values to set or override in the Postman test environment. | {} |
 
 ### postman_collection
 Object defining the collection and environment to run.
