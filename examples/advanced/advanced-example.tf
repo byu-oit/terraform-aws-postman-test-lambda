@@ -39,4 +39,7 @@ module "postman_test_lambda" {
   vpc_subnet_ids                = [data.aws_ssm_parameter.subnet_id.value]
   memory_size                   = 528
   timeout                       = 120
+  test_env_var_overrides        = {
+    foo = "boo"
+  }
 }
