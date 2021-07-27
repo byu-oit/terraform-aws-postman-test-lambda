@@ -173,9 +173,10 @@ async function updateRunner (deploymentId, combinedRunner, event, error) {
 
 function generateEnvVars () {
   const envVarsArray = []
-  const parsedVars = JSON.parse(process.env.TEST_ENV_VAR_OVERRIDES, 'base64')
+  const parsedVars = JSON.parse(process.env.TEST_ENV_VAR_OVERRIDES)
   if (Object.keys(parsedVars).length === 0) return envVarsArray
   for (const [key, value] of Object.entries(parsedVars)) {
+    console.log(`[Env Override] Setting ${key} as ${value}`)
     envVarsArray.push({ key, value })
   }
   return envVarsArray
