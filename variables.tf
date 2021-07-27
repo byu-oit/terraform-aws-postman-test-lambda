@@ -1,7 +1,7 @@
 variable "alb_wait_time" {
-  type = number
+  type        = number
   description = "The number of seconds the Lambda function should wait for the new ALB target group to initialize before running tests."
-  default = 10
+  default     = 10
 }
 
 variable "app_name" {
