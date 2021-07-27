@@ -1,3 +1,9 @@
+variable "alb_wait_time" {
+  type = number
+  description = "The number of seconds the Lambda function should wait for the new ALB target group to initialize before running tests."
+  default = 10
+}
+
 variable "app_name" {
   type        = string
   description = "Application name to name your postman test lambda function"

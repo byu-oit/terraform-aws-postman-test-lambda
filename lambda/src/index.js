@@ -24,7 +24,7 @@ exports.handler = async function (event, context) {
 
   // Workaround for CodeDeploy bug.
   // Give the ALB 10 seconds to make sure the test TG has switched to the new code.
-  const timer = sleep(10000)
+  const timer = sleep(parseInt(process.env.ALB_WAIT_TIME) * 1000)
 
   // store the error so that we can update codedeploy lifecycle if there are any errors including errors from downloading files
   let error
@@ -189,5 +189,3 @@ function sleep (ms) {
     resolve()
   }, ms))
 }
-
-// exports.handler({}, {}).then(() => {})

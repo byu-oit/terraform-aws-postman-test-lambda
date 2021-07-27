@@ -24,6 +24,7 @@ locals {
   ])
   using_local_files = length(local.local_collections) + length(local.local_environments) > 0
   lambda_env_variables = {
+    ALB_WAIT_TIME          = var.alb_wait_time
     S3_BUCKET              = local.using_local_files ? aws_s3_bucket.postman_bucket[0].bucket : null
     POSTMAN_COLLECTIONS    = jsonencode(var.postman_collections)
     POSTMAN_API_KEY        = var.postman_api_key

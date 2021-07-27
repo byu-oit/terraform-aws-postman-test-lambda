@@ -14,7 +14,7 @@ This lambda function will tell CodeDeploy if the tests pass or fail.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.1.1"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.2.0"
   app_name = "simple-example"
   postman_collections = [
     {
@@ -85,7 +85,7 @@ selecting your collection/environment and clicking on the info icon.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.1.1"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.2.0"
   app_name = "from-postman-api-example"
   postman_collections = [
     {
@@ -108,6 +108,7 @@ module "postman_test_lambda" {
 
 | Name                          | Type        | Description                                                                                                                                          | Default |
 | ----------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| alb_wait_time                 | number      | The number of seconds the Lambda function should wait for the new ALB target group to initialize before running tests.                               | 10      |
 | app_name                      | string      | Application name to prefix your postman test lambda function's name                                                                                  |         |
 | postman_collections           | list([object](#postman_collection))| List of postman collections and environments. See [postman_collection](#postman_collection)                                   |         |
 | postman_api_key               | string      | Postman API key to download collections/environments from Postman API (must be provided if you provide any postman IDs in `postman_collection` variable) | null    |
