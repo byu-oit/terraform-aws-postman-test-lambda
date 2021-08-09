@@ -106,20 +106,20 @@ module "postman_test_lambda" {
 
 ## Inputs
 
-| Name                          | Type        | Description                                                                                                                                          | Default |
-| ----------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| alb_wait_time                 | number      | The number of seconds the Lambda function should wait for the new ALB target group to initialize before running tests.                               | 10      |
-| app_name                      | string      | Application name to prefix your postman test lambda function's name                                                                                  |         |
-| postman_collections           | list([object](#postman_collection))| List of postman collections and environments. See [postman_collection](#postman_collection)                                   |         |
-| postman_api_key               | string      | Postman API key to download collections/environments from Postman API (must be provided if you provide any postman IDs in `postman_collection` variable) | null    |
-| role_permissions_boundary_arn | string      | ARN of the IAM Role permissions boundary to place on each IAM role created                                                                           |         |
-| log_retention_in_days         | number      | CloudWatch log group retention in days                                                                                                               | 7       |
-| tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                 | {}      |
-| timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                | 30      |
-| memory_size                   | number      | The size of the memory of the lambda                                                                               | 128     |
-| vpc_id                        | string      | The id of the VPC the lambda will be behind if VPC configuration is desired. (must be provided with lambda_vpc_subnet_ids)          | null      |
-| vpc_subnet_ids         | list(string) | A list of subnet ids the lambda will be put in if VPC configuration is desired. (must be provided with vpc_id) | [] |
-| test_env_var_overrides | map(string) | Values to set or override in the Postman test environment. | {} |
+| Name                          | Type        | Description                                                                                                                                                                           | Default |
+| ----------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| alb_wait_time                 | number      | The number of seconds the Lambda function should wait for the new ALB target group to initialize before running tests. If you increase this, you may also need to increase `timeout`. | 10      |
+| app_name                      | string      | Application name to prefix your postman test lambda function's name                                                                                                                   |         |
+| postman_collections           | list([object](#postman_collection))| List of postman collections and environments. See [postman_collection](#postman_collection)                                                                    |         |
+| postman_api_key               | string      | Postman API key to download collections/environments from Postman API (must be provided if you provide any postman IDs in `postman_collection` variable)                              | null    |
+| role_permissions_boundary_arn | string      | ARN of the IAM Role permissions boundary to place on each IAM role created                                                                                                            |         |
+| log_retention_in_days         | number      | CloudWatch log group retention in days                                                                                                                                                | 7       |
+| tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                                                  | {}      |
+| timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                                                                                   | 30      |
+| memory_size                   | number      | The size of the memory of the lambda                                                                                                                                                  | 128     |
+| vpc_id                        | string      | The id of the VPC the lambda will be behind if VPC configuration is desired. (must be provided with lambda_vpc_subnet_ids)                                                            | null    |
+| vpc_subnet_ids         | list(string) | A list of subnet ids the lambda will be put in if VPC configuration is desired. (must be provided with vpc_id)                                                                              | []      |
+| test_env_var_overrides | map(string) | Values to set or override in the Postman test environment.                                                                                                                                   | {}      |
 
 ### postman_collection
 Object defining the collection and environment to run.
