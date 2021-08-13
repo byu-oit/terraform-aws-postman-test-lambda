@@ -68,6 +68,16 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "default_logs" {
+  count = local.using_local_files ? 1 : 0
+
+  bucket                  = aws_s3_bucket.postman_bucket_logs[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket" "postman_bucket" {
   count = local.using_local_files ? 1 : 0
 
