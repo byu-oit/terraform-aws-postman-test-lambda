@@ -181,7 +181,7 @@ resource "aws_lambda_function" "test_lambda" {
   runtime          = "nodejs14.x"
   timeout          = var.timeout
   memory_size      = var.memory_size
-  source_code_hash = base64sha256("${path.module}/lambda/dist/function.zip")
+  source_code_hash = filebase64sha256("${path.module}/lambda/dist/function.zip")
   environment {
     variables = local.lambda_env_variables
   }
