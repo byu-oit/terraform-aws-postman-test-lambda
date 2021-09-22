@@ -45,6 +45,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_s3_bucket" "postman_bucket_logs" {
   count = local.using_local_files ? 1 : 0
 
+  force_destroy = true
   bucket = "${var.app_name}-postman-tests-${data.aws_caller_identity.current.account_id}-logs"
   acl    = "log-delivery-write"
   tags   = var.tags
@@ -81,6 +82,7 @@ resource "aws_s3_bucket_public_access_block" "default_logs" {
 resource "aws_s3_bucket" "postman_bucket" {
   count = local.using_local_files ? 1 : 0
 
+  force_destroy = true
   bucket = var.postman_files_bucket_name != null ? var.postman_files_bucket_name : "${var.app_name}-postman-files"
   logging {
     target_bucket = aws_s3_bucket.postman_bucket_logs[0].id
