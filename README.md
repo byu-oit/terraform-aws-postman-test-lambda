@@ -14,7 +14,7 @@ This lambda function will tell CodeDeploy if the tests pass or fail.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.2.3"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.2.4"
   app_name = "simple-example"
   postman_collections = [
     {
@@ -85,7 +85,7 @@ selecting your collection/environment and clicking on the info icon.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.2.3"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v3.2.4"
   app_name = "from-postman-api-example"
   postman_collections = [
     {
@@ -113,7 +113,7 @@ module "postman_test_lambda" {
 | postman_collections           | list([object](#postman_collection))| List of postman collections and environments. See [postman_collection](#postman_collection)                                                                    |         |
 | postman_api_key               | string      | Postman API key to download collections/environments from Postman API (must be provided if you provide any postman IDs in `postman_collection` variable)                              | null    |
 | role_permissions_boundary_arn | string      | ARN of the IAM Role permissions boundary to place on each IAM role created                                                                                                            |         |
-| log_retention_in_days         | number      | CloudWatch log group retention in days                                                                                                                                                | 7       |
+| log_retention_in_days         | number      | CloudWatch log group and S3 log bucket retention in days                                                                                                                                                | 7       |
 | tags                          | map(string) | A map of AWS Tags to attach to each resource created                                                                                                                                  | {}      |
 | timeout                       | number      | The max number of seconds the lambda will run for without stopping.                                                                                                                   | 30      |
 | memory_size                   | number      | The size of the memory of the lambda                                                                                                                                                  | 128     |

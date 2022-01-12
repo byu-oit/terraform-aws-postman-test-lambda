@@ -36,7 +36,7 @@ variable "role_permissions_boundary_arn" {
 
 variable "log_retention_in_days" {
   type        = number
-  description = "CloudWatch log group retention in days. Defaults to 7."
+  description = "CloudWatch log group and S3 log bucket retention in days. Defaults to 7."
   default     = 7
 }
 

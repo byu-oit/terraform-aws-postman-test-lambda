@@ -54,10 +54,12 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
     id                                     = "AutoAbortFailedMultipartUpload"
     enabled                                = true
     abort_incomplete_multipart_upload_days = 10
-
+  }
+  lifecycle_rule {
+    id      = "ExpireOldLogs"
+    enabled = true
     expiration {
-      days                         = 120
-      expired_object_delete_marker = false
+      days = var.log_retention_in_days
     }
   }
   server_side_encryption_configuration {
