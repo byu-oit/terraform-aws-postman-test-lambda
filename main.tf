@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 0.12.16"
   required_providers {
-    aws = ">= 3.0.0"
+    aws = ">= 3.75.2"
   }
 }
 
@@ -192,7 +192,7 @@ resource "aws_lambda_function" "test_lambda" {
   function_name    = local.lambda_function_name
   role             = aws_iam_role.test_lambda.arn
   handler          = "index.handler"
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   timeout          = var.timeout
   memory_size      = var.memory_size
   source_code_hash = filebase64sha256("${path.module}/lambda/dist/function.zip")

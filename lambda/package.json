@@ -1,6 +1,6 @@
 {
   "name": "postman-test-lambda",
-  "version": "3.2.3",
+  "version": "4.0.0",
   "description": "Lambda function that runs postman collection tests",
   "repository": {
     "type": "git",
@@ -15,12 +15,13 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.945.0",
-    "newman": "^5.2.4",
-    "node-fetch": "^2.6.1"
+    "aws-sdk": "^2.1140.0",
+    "newman": "^5.3.2",
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.1"
+    "@zeit/ncc": "^0.22.3",
+    "standard": "^16.0.4"
   },
   "standard": {
     "ignore": [
