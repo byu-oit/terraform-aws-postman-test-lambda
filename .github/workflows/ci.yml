@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [master]
 env:
-  tf_version: "1.2.0" # must match value in examples/ci/advanced-example.tf
+  tf_version: "1.2.0" # Must be within range specified in main.tf
   node_version: "16.x"
   TF_IN_AUTOMATION: true
 
