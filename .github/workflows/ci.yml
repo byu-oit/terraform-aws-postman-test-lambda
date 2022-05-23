@@ -5,6 +5,7 @@ on:
     branches: [master]
 env:
   tf_version: "0.12.26" # must match value in examples/ci/advanced-example.tf
+  node_version: "16.x"
   TF_IN_AUTOMATION: true
 
 jobs:
