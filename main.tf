@@ -167,7 +167,7 @@ resource "aws_s3_bucket_public_access_block" "default" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_object" "collections" {
+resource "aws_s3_object" "collections" {
   count = length(local.local_collections)
 
   bucket = aws_s3_bucket.postman_bucket[0].bucket
@@ -177,7 +177,7 @@ resource "aws_s3_bucket_object" "collections" {
   tags   = var.tags
 }
 
-resource "aws_s3_bucket_object" "environments" {
+resource "aws_s3_object" "environments" {
   count = length(local.local_environments)
 
   bucket = aws_s3_bucket.postman_bucket[0].bucket
