@@ -47,26 +47,52 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
 
   force_destroy = true
   bucket        = "${var.app_name}-postman-tests-${data.aws_caller_identity.current.account_id}-logs"
-  acl           = "log-delivery-write"
   tags          = var.tags
+}
 
-  lifecycle_rule {
-    id                                     = "AutoAbortFailedMultipartUpload"
-    enabled                                = true
-    abort_incomplete_multipart_upload_days = 10
+resource "aws_s3_bucket_acl" "postman_bucket_logs" {
+  count  = local.using_local_files ? 1 : 0
+  bucket = aws_s3_bucket.postman_bucket_logs[count.index].id
+  acl    = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "postman_bucket_logs" {
+  count  = local.using_local_files ? 1 : 0
+  bucket = aws_s3_bucket.postman_bucket_logs[count.index].id
+
+  rule {
+    id     = "AutoAbortFailedMultipartUpload"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 10
+    }
   }
-  lifecycle_rule {
-    id      = "ExpireOldLogs"
-    enabled = true
+
+  rule {
+    id = "ExpireOldLogs"
     expiration {
       days = var.log_retention_in_days
     }
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
   }
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "postman_bucket_logs" {
+  count  = local.using_local_files ? 1 : 0
+  bucket = aws_s3_bucket.postman_bucket_logs[count.index].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -86,28 +112,49 @@ resource "aws_s3_bucket" "postman_bucket" {
 
   force_destroy = true
   bucket        = var.postman_files_bucket_name != null ? var.postman_files_bucket_name : "${var.app_name}-postman-files"
-  logging {
-    target_bucket = aws_s3_bucket.postman_bucket_logs[0].id
-    target_prefix = "log/"
-  }
-  lifecycle_rule {
-    id                                     = "AutoAbortFailedMultipartUpload"
-    enabled                                = true
-    abort_incomplete_multipart_upload_days = 10
+  tags          = var.tags
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "postman_bucket" {
+  count  = local.using_local_files ? 1 : 0
+  bucket = aws_s3_bucket.postman_bucket[count.index].id
+
+  rule {
+    id = "AutoAbortFailedMultipartUpload"
 
     expiration {
       days                         = 0
       expired_object_delete_marker = false
     }
-  }
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 10
     }
   }
-  tags = var.tags
+}
+
+resource "aws_s3_bucket_logging" "postman_bucket" {
+  count  = local.using_local_files ? 1 : 0
+  bucket = aws_s3_bucket.postman_bucket[count.index].id
+
+  target_bucket = aws_s3_bucket.postman_bucket_logs[0].id
+  target_prefix = "log/"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "postman_bucket" {
+  count  = local.using_local_files ? 1 : 0
+  bucket = aws_s3_bucket.postman_bucket[count.index].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "default" {
