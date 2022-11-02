@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-west-2"
+  region = "us-west-2"
 }
 
 data "aws_ssm_parameter" "role_permissions_boundary_arn" {
