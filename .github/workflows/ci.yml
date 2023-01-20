@@ -58,6 +58,10 @@ jobs:
     needs: env
     strategy:
       matrix: ${{ fromJson(needs.env.outputs.matrix) }}
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
 
