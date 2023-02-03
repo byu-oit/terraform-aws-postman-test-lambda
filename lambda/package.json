@@ -1,6 +1,6 @@
 {
   "name": "postman-test-lambda",
-  "version": "4.0.0",
+  "version": "5.0.1",
   "description": "Lambda function that runs postman collection tests",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
     "node-fetch": "^3.3.0"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.36.1",
     "standard": "^17.0.0"
   },
   "standard": {
