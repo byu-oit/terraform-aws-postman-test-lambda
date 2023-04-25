@@ -50,12 +50,6 @@ resource "aws_s3_bucket" "postman_bucket_logs" {
   tags          = var.tags
 }
 
-resource "aws_s3_bucket_acl" "postman_bucket_logs" {
-  count  = local.using_local_files ? 1 : 0
-  bucket = aws_s3_bucket.postman_bucket_logs[count.index].id
-  acl    = "log-delivery-write"
-}
-
 resource "aws_s3_bucket_lifecycle_configuration" "postman_bucket_logs" {
   count  = local.using_local_files ? 1 : 0
   bucket = aws_s3_bucket.postman_bucket_logs[count.index].id
