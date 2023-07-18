@@ -20,14 +20,14 @@ jobs:
             "env":[
               {
                 "tf_working_dir":"./examples/simple",
-                "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "aws_account":"977306314792",
+                "aws_gha_role":"postman-test-lambda-dev-gha",
                 "tf_plan_extra_args":""
               },
               {
                 "tf_working_dir":"./examples/advanced",
-                "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "aws_account":"977306314792",
+                "aws_gha_role":"postman-test-lambda-dev-gha",
                 "tf_plan_extra_args":"-var 'postman_api_key=fake_api_key'"
               }
             ]
@@ -62,14 +62,15 @@ jobs:
       contents: read
       actions: read
       pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v3
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets[matrix.env.aws_key_name] }}
-          aws-secret-access-key: ${{ secrets[matrix.env.aws_secret_name] }}
+          role-to-assume: "arn:aws:iam::${{ matrix.env.aws_account }}:role/${{ matrix.env.aws_gha_role }}"
+          role-session-name: ${{ github.sha }}
           aws-region: us-west-2
 
       - name: Terraform Setup
