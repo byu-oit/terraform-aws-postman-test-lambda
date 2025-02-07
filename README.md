@@ -101,7 +101,7 @@ module "postman_test_lambda" {
 ## Requirements
 
 * Terraform version 1.3.0 or greater
-* Terraform AWS Provider version 4.0.0 or greater
+* Terraform AWS Provider version 5.26.0 or greater
 * _Postman JSON collections/environments files (optional)_ if you want export them to JSON files and include them in your project repo
 * _Postman API (optional)_ if you want to download Postman collections/environments from Postman instead of providing the json files in your repo
 
