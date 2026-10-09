@@ -78,6 +78,43 @@ test('rejects invocations that omit the collection configuration', async () => {
   await assert.rejects(handler({}), /POSTMAN_COLLECTIONS is required/)
 })
 
+test('downloads Postman collections and environments with native fetch', async t => {
+  process.env.POSTMAN_API_KEY = 'test-api-key'
+  process.env.POSTMAN_COLLECTIONS = JSON.stringify([{ collection: 'collection-id', environment: 'environment-id' }])
+  const environment = { name: 'test', values: [] }
+  const fetch = t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(options.method, 'GET')
+    assert.equal(options.headers['X-Api-Key'], 'test-api-key')
+    if (url === 'https://api.getpostman.com/collections/collection-id') {
+      return Response.json({ collection: emptyCollection })
+    }
+    assert.equal(url, 'https://api.getpostman.com/environments/environment-id')
+    return Response.json({ environment })
+  })
+  const codedeploy = mockCodeDeploy(t)
+  await handler(deploymentEvent)
+  assert.equal(fetch.mock.callCount(), 2)
+  assert.equal(codedeploy.mock.calls[0].arguments[0].input.status, 'Succeeded')
+  assert.deepEqual(JSON.parse(await fs.readFile(path.join(tmpDir, 'collection-id.json'), 'utf8')), { collection: emptyCollection })
+  assert.deepEqual(JSON.parse(await fs.readFile(path.join(tmpDir, 'environment-id.json'), 'utf8')), { environment })
+})
+
+test('reports Postman HTTP errors and rejects the invocation', async t => {
+  process.env.POSTMAN_COLLECTIONS = JSON.stringify([{ collection: 'collection-id', environment: null }])
+  t.mock.method(globalThis, 'fetch', async () => Response.json({ error: { message: 'invalid API key' } }, { status: 401 }))
+  const codedeploy = mockCodeDeploy(t)
+  await assert.rejects(handler(deploymentEvent), /invalid API key/)
+  assert.equal(codedeploy.mock.calls[0].arguments[0].input.status, 'Failed')
+})
+
+test('reports Postman network errors and rejects the invocation', async t => {
+  process.env.POSTMAN_COLLECTIONS = JSON.stringify([{ collection: 'collection-id', environment: null }])
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('network unavailable') })
+  const codedeploy = mockCodeDeploy(t)
+  await assert.rejects(handler(deploymentEvent), /Error trying to download collection collection-id from Postman API:.*network unavailable/)
+  assert.equal(codedeploy.mock.calls[0].arguments[0].input.status, 'Failed')
+})
+
 test('runs Newman requests with environment overrides and rejects failed assertions', async t => {
   const server = createServer((request, response) => {
     response.writeHead(200, { 'Content-Type': 'application/json' })

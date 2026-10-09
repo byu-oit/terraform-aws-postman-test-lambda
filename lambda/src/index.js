@@ -1,10 +1,11 @@
-const fs = require('fs').promises
-const os = require('os')
-const { sep } = require('path')
+const fs = require('node:fs/promises')
+const os = require('node:os')
+const { sep } = require('node:path')
+const { setTimeout: sleep } = require('node:timers/promises')
 const newman = require('newman')
 const { CodeDeployClient, PutLifecycleEventHookExecutionStatusCommand } = require('@aws-sdk/client-codedeploy')
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3')
-const path = require('path')
+const path = require('node:path')
 const codedeploy = new CodeDeployClient({ region: 'us-west-2' })
 const s3 = new S3Client({ region: 'us-west-2' })
 
@@ -80,7 +81,6 @@ exports.handler = async function (event, context) {
 }
 
 async function downloadFileFromPostman (type, id) {
-  const { default: fetch } = await import('node-fetch')
   const filename = `${tmpDir}${sep}${id}.json`
   console.log(`started download for ${filename}`)
   const response = await fetch(`https://api.getpostman.com/${type}s/${id}`, {
@@ -181,12 +181,4 @@ function generateEnvVars () {
     envVarsArray.push({ key, value })
   }
   return envVarsArray
-}
-
-function sleep (ms) {
-  console.log('started sleep timer')
-  return new Promise(resolve => setTimeout(args => {
-    console.log('ended sleep timer')
-    resolve()
-  }, ms))
 }
