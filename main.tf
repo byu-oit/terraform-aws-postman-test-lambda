@@ -1,7 +1,6 @@
 terraform {
   required_version = ">= 1.3.0, < 2.0.0"
   required_providers {
-    # AWS provider 6.21.0 added support for the nodejs24.x Lambda runtime.
     aws = ">= 6.21.0"
   }
 }
@@ -234,7 +233,7 @@ resource "aws_lambda_function" "test_lambda" {
   function_name    = local.lambda_function_name
   role             = aws_iam_role.test_lambda.arn
   handler          = "index.handler"
-  runtime          = "nodejs24.x" # Node.js 24 LTS; requires AWS provider >= 6.21.0.
+  runtime          = "nodejs24.x"
   timeout          = var.timeout
   memory_size      = var.memory_size
   source_code_hash = filebase64sha256("${path.module}/lambda/dist/function.zip")
