@@ -16,7 +16,7 @@ The Lambda function uses the Node.js 24 runtime.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v6.0.0"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v7.0.0"
   app_name = "simple-example"
   postman_collections = [
     {
@@ -87,7 +87,7 @@ selecting your collection/environment and clicking on the info icon.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v6.0.0"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v7.0.0"
   app_name = "from-postman-api-example"
   postman_collections = [
     {
@@ -141,7 +141,7 @@ Object defining the collection and environment to run.
 
 ## Contributing
 
-To contribute to this terraform module make a feature branch and create a Pull Request to the `master` branch.
+To contribute to this terraform module make a feature branch and create a Pull Request to the `main` branch.
 
 This terraform module bakes in the lambda function code in the committed [function.zip](lambda/dist/function.zip) file.
 

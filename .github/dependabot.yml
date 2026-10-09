@@ -7,7 +7,3 @@ updates:
   open-pull-requests-limit: 10
   reviewers:
   - yoshutch
-  ignore:
-  - dependency-name: aws-sdk
-    versions:
-    - 2.x

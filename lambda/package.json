@@ -1,6 +1,6 @@
 {
   "name": "postman-test-lambda",
-  "version": "5.0.2",
+  "version": "7.0.0",
   "description": "Lambda function that runs postman collection tests",
   "repository": {
     "type": "git",
@@ -11,20 +11,31 @@
     "node": "24.x"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
-    "lint": "npx standard",
-    "package": "npx ncc build src/index.js -m -o dist && zip -rj dist/function.zip dist/index.js"
+    "test": "node --test",
+    "lint": "standard",
+    "package": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && ncc build src/index.js -m -o dist && cd dist && zip -r function.zip . -x function.zip"
   },
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.1140.0",
-    "newman": "^5.3.2",
-    "node-fetch": "^3.3.1"
+    "@aws-sdk/client-codedeploy": "^3.1148.0",
+    "@aws-sdk/client-s3": "^3.1148.0",
+    "newman": "^6.2.3",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.36.1",
-    "standard": "^17.0.0"
+    "@vercel/ncc": "^0.45.0",
+    "standard": "^17.1.2"
+  },
+  "overrides": {
+    "flatted": "^3.4.4",
+    "handlebars": "^4.7.10",
+    "jose": "^4.15.9",
+    "lodash": "^4.18.1",
+    "node-forge": "^1.4.0",
+    "postman-request": "2.88.1-postman.49",
+    "qs": "^6.16.0",
+    "underscore": "^1.13.8"
   },
   "standard": {
     "ignore": [

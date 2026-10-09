@@ -104,9 +104,17 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
-      - name: npm install
+      - name: npm ci
         working-directory: lambda
-        run: npm install --production
+        run: npm ci
+
+      - name: npm test
+        working-directory: lambda
+        run: npm test
+
+      - name: Package Lambda
+        working-directory: lambda
+        run: npm run package
 
   audit:
     name: Audit
@@ -134,9 +142,9 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
-      - name: npm install
+      - name: npm ci
         working-directory: lambda
-        run: npm install
+        run: npm ci
 
       - name: npm lint
         working-directory: lambda
