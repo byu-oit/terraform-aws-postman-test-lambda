@@ -10,4 +10,4 @@ for (const entry of readdirSync('dist', { recursive: true, withFileTypes: true }
   if (archivePath !== 'function.zip') files[archivePath] = readFileSync(filename)
 }
 
-writeFileSync('dist/function.zip', zipSync(files, { level: 9 }))
+writeFileSync('dist/function.zip', zipSync(files, { level: 9, os: 3, attrs: 0o100644 << 16 }))
