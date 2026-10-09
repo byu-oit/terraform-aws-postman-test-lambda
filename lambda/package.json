@@ -7,6 +7,9 @@
     "url": "https://github.com/byu-oit/terraform-aws-postman-test-lambda"
   },
   "main": "src/index.js",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "lint": "npx standard",

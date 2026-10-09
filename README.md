@@ -8,6 +8,8 @@ This lambda function is intended for use with [CodeDeploy's lifecycle hooks](htt
 This lambda function will attempt to run the [newman](https://www.npmjs.com/package/newman) CLI to run your Postman collection as a test.
 This lambda function will tell CodeDeploy if the tests pass or fail.
 
+The Lambda function uses the Node.js 24 runtime.
+
 #### [New to Terraform Modules at BYU?](https://github.com/byu-oit/terraform-documentation)
 
 ## Usage
@@ -101,7 +103,7 @@ module "postman_test_lambda" {
 ## Requirements
 
 * Terraform version 1.3.0 or greater
-* Terraform AWS Provider version 5.26.0 or greater
+* Terraform AWS Provider version 6.21.0 or greater (required for the Node.js 24 runtime)
 * _Postman JSON collections/environments files (optional)_ if you want export them to JSON files and include them in your project repo
 * _Postman API (optional)_ if you want to download Postman collections/environments from Postman instead of providing the json files in your repo
 
@@ -142,6 +144,8 @@ Object defining the collection and environment to run.
 To contribute to this terraform module make a feature branch and create a Pull Request to the `master` branch.
 
 This terraform module bakes in the lambda function code in the committed [function.zip](lambda/dist/function.zip) file.
+
+Use Node.js 24 when installing dependencies and building the Lambda package.
 
 If you change the [index.js](lambda/src/index.js) file then you'll need to run `npm run package` and commit
 the [function.zip](lambda/dist/function.zip) file.
