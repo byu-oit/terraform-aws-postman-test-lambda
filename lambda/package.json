@@ -12,8 +12,8 @@
   },
   "scripts": {
     "test": "node --test",
-    "lint": "standard",
-    "package": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && ncc build src/index.js -m -o dist && cd dist && zip -r function.zip . -x function.zip"
+    "lint": "npx standard",
+    "package": "node scripts/clean.js && npx ncc build src/index.js -m -o dist && node scripts/zip.js"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@vercel/ncc": "^0.45.0",
+    "fflate": "^0.8.3",
     "standard": "^17.1.2"
   },
   "overrides": {
