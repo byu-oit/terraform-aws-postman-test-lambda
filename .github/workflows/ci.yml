@@ -41,10 +41,10 @@ jobs:
     name: Terraform Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.tf_version }}
 
@@ -64,17 +64,17 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: "arn:aws:iam::${{ matrix.env.aws_account }}:role/${{ matrix.env.aws_gha_role }}"
           role-session-name: ${{ github.sha }}
           aws-region: us-west-2
 
       - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.tf_version }}
 
@@ -87,7 +87,7 @@ jobs:
         run: terraform plan -input=false -out=plan ${{ matrix.env.tf_plan_extra_args }}
 
       - name: Comment Terraform Plan
-        uses: byu-oit/github-action-tf-plan-comment@v1
+        uses: byu-oit/github-action-tf-plan-comment@v1.3.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: ${{ matrix.env.tf_working_dir }}
@@ -98,9 +98,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.node_version }}
 
@@ -120,10 +120,10 @@ jobs:
     name: Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.node_version }}
 
@@ -135,10 +135,10 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.node_version }}
 
