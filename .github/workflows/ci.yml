@@ -110,7 +110,16 @@ jobs:
 
       - name: npm test
         working-directory: lambda
-        run: npm test
+        run: npm run test:coverage
+
+      - name: Report test coverage to Codecov
+        uses: codecov/codecov-action@v7
+        if: env.CODECOV_TOKEN
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: lambda/lcov.info
+          disable_search: true
 
       - name: Package Lambda
         working-directory: lambda

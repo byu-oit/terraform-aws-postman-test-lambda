@@ -19,6 +19,7 @@ override.tf.json
 .idea
 
 node_modules
+/lambda/lcov.info
 
 # Ignore generated bundle files; commit only the deployment ZIP.
 /lambda/dist/*

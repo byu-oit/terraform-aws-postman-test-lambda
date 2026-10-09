@@ -12,6 +12,7 @@
   },
   "scripts": {
     "test": "node --test",
+    "test:coverage": "node --test --test-reporter=spec --test-reporter-destination=stdout --experimental-test-coverage --test-coverage-include=src/** --test-reporter=lcov --test-reporter-destination=lcov.info",
     "lint": "npx standard",
     "package": "node scripts/clean.js && npx ncc build src/index.js -m -o dist && node scripts/zip.js"
   },
