@@ -14,7 +14,7 @@ This lambda function will tell CodeDeploy if the tests pass or fail.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v6.0.0"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v7.0.0"
   app_name = "simple-example"
   postman_collections = [
     {
@@ -85,7 +85,7 @@ selecting your collection/environment and clicking on the info icon.
 
 ```hcl
 module "postman_test_lambda" {
-  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v6.0.0"
+  source = "github.com/byu-oit/terraform-aws-postman-test-lambda?ref=v7.0.0"
   app_name = "from-postman-api-example"
   postman_collections = [
     {
@@ -101,7 +101,7 @@ module "postman_test_lambda" {
 ## Requirements
 
 * Terraform version 1.3.0 or greater
-* Terraform AWS Provider version 5.26.0 or greater
+* Terraform AWS Provider version 6.21.0 or greater
 * _Postman JSON collections/environments files (optional)_ if you want export them to JSON files and include them in your project repo
 * _Postman API (optional)_ if you want to download Postman collections/environments from Postman instead of providing the json files in your repo
 
@@ -139,7 +139,7 @@ Object defining the collection and environment to run.
 
 ## Contributing
 
-To contribute to this terraform module make a feature branch and create a Pull Request to the `master` branch.
+To contribute to this terraform module make a feature branch and create a Pull Request to the `main` branch.
 
 This terraform module bakes in the lambda function code in the committed [function.zip](lambda/dist/function.zip) file.
 

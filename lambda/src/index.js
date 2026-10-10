@@ -1,12 +1,13 @@
-const fetch = require('node-fetch')
-const fs = require('fs').promises
-const os = require('os')
-const { sep } = require('path')
+const fs = require('node:fs/promises')
+const os = require('node:os')
+const { sep } = require('node:path')
+const { setTimeout: sleep } = require('node:timers/promises')
 const newman = require('newman')
-const AWS = require('aws-sdk')
-const path = require('path')
-const codedeploy = new AWS.CodeDeploy({ apiVersion: '2014-10-06', region: 'us-west-2' })
-const s3 = new AWS.S3({ apiVersion: '2014-10-06', region: 'us-west-2' })
+const { CodeDeployClient, PutLifecycleEventHookExecutionStatusCommand } = require('@aws-sdk/client-codedeploy')
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3')
+const path = require('node:path')
+const codedeploy = new CodeDeployClient({ region: 'us-west-2' })
+const s3 = new S3Client({ region: 'us-west-2' })
 
 const tmpDir = process.env.TMP_DIR || os.tmpdir()
 
@@ -108,16 +109,16 @@ async function downloadFileFromBucket (key) {
 
   let data
   try {
-    data = await s3.getObject({
+    data = await s3.send(new GetObjectCommand({
       Bucket: process.env.S3_BUCKET,
       Key: key
-    }).promise()
+    }))
   } catch (err) {
     console.error(`error trying to get object from bucket: ${err}`)
     throw err
   }
 
-  await fs.writeFile(filename, data.Body.toString())
+  await fs.writeFile(filename, await data.Body.transformToString())
   console.log(`downloaded ${filename}`)
   return filename
 }
@@ -151,12 +152,12 @@ async function updateRunner (deploymentId, combinedRunner, event, error) {
   if (deploymentId) {
     console.log('starting to update CodeDeploy lifecycle event hook status...')
     const params = {
-      deploymentId: deploymentId,
+      deploymentId,
       lifecycleEventHookExecutionId: event.LifecycleEventHookExecutionId,
       status: error ? 'Failed' : 'Succeeded'
     }
     try {
-      const data = await codedeploy.putLifecycleEventHookExecutionStatus(params).promise()
+      const data = await codedeploy.send(new PutLifecycleEventHookExecutionStatusCommand(params))
       console.log(data)
     } catch (err) {
       console.log(err, err.stack)
@@ -180,12 +181,4 @@ function generateEnvVars () {
     envVarsArray.push({ key, value })
   }
   return envVarsArray
-}
-
-function sleep (ms) {
-  console.log('started sleep timer')
-  return new Promise(resolve => setTimeout(args => {
-    console.log('ended sleep timer')
-    resolve()
-  }, ms))
 }

@@ -19,6 +19,8 @@ override.tf.json
 .idea
 
 node_modules
+/lambda/lcov.info
 
-# Ignore the generated minified index.js since it's bundled inside of the dist/function.zip file
-/lambda/dist/index.js
+# Ignore generated bundle files; commit only the deployment ZIP.
+/lambda/dist/*
+!/lambda/dist/function.zip

@@ -1,27 +1,42 @@
 {
   "name": "postman-test-lambda",
-  "version": "5.0.2",
+  "version": "7.0.0",
   "description": "Lambda function that runs postman collection tests",
   "repository": {
     "type": "git",
     "url": "https://github.com/byu-oit/terraform-aws-postman-test-lambda"
   },
   "main": "src/index.js",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
+    "test": "node --test",
+    "test:coverage": "node --test --test-reporter=spec --test-reporter-destination=stdout --experimental-test-coverage --test-coverage-include=src/** --test-reporter=lcov --test-reporter-destination=lcov.info",
     "lint": "npx standard",
-    "package": "npx ncc build src/index.js -m -o dist && zip -rj dist/function.zip dist/index.js"
+    "package": "node scripts/clean.js && npx ncc build src/index.js -m -o dist && node scripts/zip.js"
   },
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.1140.0",
-    "newman": "^5.3.2",
-    "node-fetch": "^3.3.1"
+    "@aws-sdk/client-codedeploy": "^3.1148.0",
+    "@aws-sdk/client-s3": "^3.1148.0",
+    "newman": "^6.2.3"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.36.1",
-    "standard": "^17.0.0"
+    "@vercel/ncc": "^0.45.0",
+    "fflate": "^0.8.3",
+    "standard": "^17.1.2"
+  },
+  "overrides": {
+    "flatted": "^3.4.4",
+    "handlebars": "^4.7.10",
+    "jose": "^4.15.9",
+    "lodash": "^4.18.1",
+    "node-forge": "^1.4.0",
+    "postman-request": "2.88.1-postman.49",
+    "qs": "^6.16.0",
+    "underscore": "^1.13.8"
   },
   "standard": {
     "ignore": [
