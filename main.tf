@@ -42,6 +42,8 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+# Access logs use unique object keys and expire according to the retention period.
+#trivy:ignore:AVD-AWS-0090
 resource "aws_s3_bucket" "postman_bucket_logs" {
   count = local.using_local_files ? 1 : 0
 
@@ -80,6 +82,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "postman_bucket_logs" {
   }
 }
 
+# S3-managed encryption is sufficient for deployment test access logs.
+#trivy:ignore:AVD-AWS-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "postman_bucket_logs" {
   count  = local.using_local_files ? 1 : 0
   bucket = aws_s3_bucket.postman_bucket_logs[count.index].id
@@ -101,6 +105,8 @@ resource "aws_s3_bucket_public_access_block" "default_logs" {
   restrict_public_buckets = true
 }
 
+# Terraform deploys test files from source control; the Lambda reads the latest objects.
+#trivy:ignore:AVD-AWS-0090
 resource "aws_s3_bucket" "postman_bucket" {
   count = local.using_local_files ? 1 : 0
 
@@ -140,6 +146,8 @@ resource "aws_s3_bucket_logging" "postman_bucket" {
   target_prefix = "log/"
 }
 
+# S3-managed encryption is sufficient for deployment test files.
+#trivy:ignore:AVD-AWS-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "postman_bucket" {
   count  = local.using_local_files ? 1 : 0
   bucket = aws_s3_bucket.postman_bucket[count.index].id
@@ -228,6 +236,8 @@ resource "aws_iam_role_policy_attachment" "s3_access" {
 # -----------------------------------------------------------------------------
 # START OF LAMBDA FUNCTION
 # -----------------------------------------------------------------------------
+# Newman output and CloudWatch logs provide diagnostics for deployment tests.
+#trivy:ignore:AVD-AWS-0066
 resource "aws_lambda_function" "test_lambda" {
   filename         = "${path.module}/lambda/dist/function.zip"
   function_name    = local.lambda_function_name
@@ -342,6 +352,8 @@ resource "aws_security_group" "lambda_vpc_sg" {
   }
 }
 
+# CloudWatch's default encryption is sufficient for deployment test logs.
+#trivy:ignore:AVD-AWS-0017
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${local.lambda_function_name}"
   retention_in_days = var.log_retention_in_days
