@@ -20,7 +20,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@aws-sdk/client-codedeploy": "^3.1148.0",
-    "@aws-sdk/client-s3": "^3.1148.0",
+    "@aws-sdk/client-s3": "^3.1155.0",
     "newman": "^6.2.3"
   },
   "devDependencies": {
